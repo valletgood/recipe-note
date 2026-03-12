@@ -1,64 +1,113 @@
-import Image from 'next/image';
+"use client";
 
-export default function Home() {
+import { useMemo, useState } from "react";
+import SearchBar from "@/components/ui/SearchBar";
+import CategorySection from "@/components/recipe/CategorySection";
+import EmptyState from "@/components/EmptyState";
+import { MAIN_PAGE } from "@/constants/ui";
+import {
+  RECIPE_CATEGORIES,
+  getCategoryLabel,
+} from "@/constants/recipe-categories";
+import { MOCK_RECIPES } from "@/lib/mock-recipes";
+import type { RecipeCategoryValue } from "@/constants/recipe-categories";
+import type { Recipe } from "@/types/recipe";
+
+function groupByCategory(recipes: Recipe[]) {
+  const grouped = new Map<RecipeCategoryValue, Recipe[]>();
+  const uncategorized: Recipe[] = [];
+
+  for (const recipe of recipes) {
+    if (recipe.category) {
+      const list = grouped.get(recipe.category) ?? [];
+      list.push(recipe);
+      grouped.set(recipe.category, list);
+    } else {
+      uncategorized.push(recipe);
+    }
+  }
+
+  const result: { value: RecipeCategoryValue | null; label: string; recipes: Recipe[] }[] = [];
+  for (const cat of RECIPE_CATEGORIES) {
+    const list = grouped.get(cat.value);
+    if (list && list.length > 0) {
+      result.push({ value: cat.value, label: cat.label, recipes: list });
+    }
+  }
+  if (uncategorized.length > 0) {
+    result.push({ value: null, label: "기타", recipes: uncategorized });
+  }
+  return result;
+}
+
+export default function MainPage() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredRecipes = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return MOCK_RECIPES;
+    return MOCK_RECIPES.filter(
+      (r) =>
+        r.title.toLowerCase().includes(q) ||
+        (r.description?.toLowerCase().includes(q) ?? false) ||
+        (r.category ? getCategoryLabel(r.category).includes(q) : false) ||
+        (r.ingredients?.some((i) => i.name.toLowerCase().includes(q)) ?? false)
+    );
+  }, [searchQuery]);
+
+  const grouped = useMemo(() => groupByCategory(filteredRecipes), [filteredRecipes]);
+
+  const showEmptyState = filteredRecipes.length === 0;
+  const isSearchResultEmpty = searchQuery.trim() !== "" && showEmptyState;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between bg-white px-16 py-32 sm:items-start dark:bg-black">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl leading-10 font-semibold tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="relative z-10 min-h-screen">
+      <header className="sticky top-0 z-20 border-b border-[var(--glass-border)] bg-[var(--background)]/80 backdrop-blur-md">
+        <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6">
+          <h1 className="font-display text-2xl font-bold text-[var(--foreground)] sm:text-3xl">
+            {MAIN_PAGE.TITLE}
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{' '}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{' '}
-            or the{' '}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{' '}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="bg-foreground text-background flex h-12 w-full items-center justify-center gap-2 rounded-full px-5 transition-colors hover:bg-[#383838] md:w-[158px] dark:hover:bg-[#ccc]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+          <div className="mt-4">
+            <SearchBar
+              placeholder={MAIN_PAGE.SEARCH_PLACEHOLDER}
+              value={searchQuery}
+              onChange={setSearchQuery}
+              onSearch={setSearchQuery}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] md:w-[158px] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+          </div>
         </div>
+      </header>
+
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+        {showEmptyState ? (
+          <EmptyState
+            title={
+              isSearchResultEmpty
+                ? "검색 결과가 없어요"
+                : MAIN_PAGE.EMPTY_TITLE
+            }
+            description={
+              isSearchResultEmpty
+                ? "다른 키워드로 검색해 보세요."
+                : MAIN_PAGE.EMPTY_DESCRIPTION
+            }
+          />
+        ) : (
+          <div className="space-y-8">
+            {grouped.map((group, index) => (
+              <div
+                key={group.value ?? "etc"}
+                className="animate-[staggerFade_0.4s_ease-out_both]"
+                style={{ animationDelay: `${index * 0.06}s` }}
+              >
+                <CategorySection
+                  label={group.label}
+                  recipes={group.recipes}
+                />
+              </div>
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );

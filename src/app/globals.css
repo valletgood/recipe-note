@@ -1,26 +1,111 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
+/* Recipe Note - White background + Point #345F53 + Glassmorphism */
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1a1a1a;
+  /* Point color: #345F53 (sage green) */
+  --point: #345f53;
+  --point-light: #4a7268;
+  --point-muted: rgba(52, 95, 83, 0.6);
+  --point-bg: rgba(52, 95, 83, 0.06);
+  --point-pale: rgba(52, 95, 83, 0.18);
+  /* Glass */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(52, 95, 83, 0.15);
+  --glass-shadow: 0 8px 32px rgba(52, 95, 83, 0.08);
+  --glass-bg-strong: rgba(255, 255, 255, 0.9);
 }
+
+/* 다크 모드는 추후 적용 예정 — 현재는 라이트(화이트) 모드만 사용 */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-point: var(--point);
+  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+
+/* Subtle background texture (point color tint) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(
+      ellipse 80% 50% at 50% -20%,
+      rgba(52, 95, 83, 0.06),
+      transparent
+    ),
+    radial-gradient(
+      ellipse 60% 40% at 100% 100%,
+      rgba(52, 95, 83, 0.04),
+      transparent
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Glass utility */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-strong {
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes staggerFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Accordion collapse/expand */
+.accordion-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-rows 0.25s ease,
+    opacity 0.2s ease;
+}
+
+.accordion-panel > * {
+  overflow: hidden;
+}
+
+.accordion-panel-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
 }
