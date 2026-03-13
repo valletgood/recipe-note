@@ -16,7 +16,8 @@ alwaysApply: true
 
 - 컴포넌트: `src/components/` 하위에 배치
 - 유틸리티: `src/utils/` 하위에 배치
-- API 호출: `src/api/` 하위에 배치
+- API 호출: `src/api/{도메인}/` 하위에 `service.ts`, `types.ts`, `hooks.ts`로 분리 배치 (상세: `api-structure.mdc` 참고)
+- 공통 라이브러리: `src/lib/` 하위에 배치 (axios 인스턴스, QueryProvider 등)
 
 ## 금지 사항
 

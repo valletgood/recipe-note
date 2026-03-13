@@ -9,14 +9,13 @@ import CookingStepsSection from "@/components/recipe/form/CookingStepsSection";
 import NutritionSection from "@/components/recipe/form/NutritionSection";
 import Button from "@/components/ui/Button";
 import { ADD_RECIPE_PAGE, NAV } from "@/constants/ui";
-import { analyzeRecipeFromUrl } from "@/api/analyze-recipe";
+import { useAnalyzeRecipe } from "@/api/recipe/hooks";
 import type { BasicInfoData } from "@/components/recipe/form/BasicInfoSection";
 import type { NutritionData } from "@/components/recipe/form/NutritionSection";
 import type { Ingredient, CookingStep } from "@/types/recipe";
 
 export default function NewRecipePage() {
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analyzeError, setAnalyzeError] = useState<string | null>(null);
+  const analyzeMutation = useAnalyzeRecipe();
 
   const [basicInfo, setBasicInfo] = useState<BasicInfoData>({
     title: "",
@@ -42,45 +41,41 @@ export default function NewRecipePage() {
     fat: "",
   });
 
-  const handleAnalyze = useCallback(async (url: string) => {
-    setIsAnalyzing(true);
-    setAnalyzeError(null);
+  const handleAnalyze = useCallback(
+    (url: string) => {
+      analyzeMutation.mutate(
+        { url },
+        {
+          onSuccess: (result) => {
+            if (result.error !== 0 || !result.data) {
+              return;
+            }
 
-    try {
-      const result = await analyzeRecipeFromUrl(url);
+            const data = result.data;
 
-      if (result.error !== 0 || !result.data) {
-        setAnalyzeError(result.message);
-        return;
-      }
+            setBasicInfo({
+              title: data.title,
+              description: data.description,
+              category: data.category,
+              difficulty: data.difficulty,
+              cookTimeMinutes: String(data.cookTimeMinutes),
+              servingCount: String(data.servingCount),
+            });
 
-      const data = result.data;
-
-      setBasicInfo({
-        title: data.title,
-        description: data.description,
-        category: data.category,
-        difficulty: data.difficulty,
-        cookTimeMinutes: String(data.cookTimeMinutes),
-        servingCount: String(data.servingCount),
-      });
-
-      setIngredients(data.ingredients);
-      setCookingSteps(data.cookingSteps);
-      setNutrition({
-        calories: String(data.nutrition.calories),
-        carbohydrates: String(data.nutrition.carbohydrates),
-        protein: String(data.nutrition.protein),
-        fat: String(data.nutrition.fat),
-      });
-    } catch {
-      setAnalyzeError(
-        "레시피 분석 중 오류가 발생했습니다. 다시 시도해주세요."
+            setIngredients(data.ingredients);
+            setCookingSteps(data.cookingSteps);
+            setNutrition({
+              calories: String(data.nutrition.calories),
+              carbohydrates: String(data.nutrition.carbohydrates),
+              protein: String(data.nutrition.protein),
+              fat: String(data.nutrition.fat),
+            });
+          },
+        }
       );
-    } finally {
-      setIsAnalyzing(false);
-    }
-  }, []);
+    },
+    [analyzeMutation]
+  );
 
   const handleSave = useCallback(() => {
     // TODO: 저장 API 연동
@@ -114,8 +109,14 @@ export default function NewRecipePage() {
           <div className="animate-[staggerFade_0.4s_ease-out_both]">
             <UrlAnalyzeSection
               onAnalyze={handleAnalyze}
-              isAnalyzing={isAnalyzing}
-              errorMessage={analyzeError}
+              isAnalyzing={analyzeMutation.isPending}
+              errorMessage={
+                analyzeMutation.isError
+                  ? "레시피 분석 중 오류가 발생했습니다. 다시 시도해주세요."
+                  : analyzeMutation.data && analyzeMutation.data.error !== 0
+                    ? analyzeMutation.data.message
+                    : null
+              }
             />
           </div>
 
