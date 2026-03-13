@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import type { SelectHTMLAttributes } from "react";
+import type { SelectHTMLAttributes } from 'react';
 
 interface SelectOption {
   value: string;
@@ -19,11 +19,11 @@ export default function Select({
   error,
   options,
   placeholder,
-  className = "",
+  className = '',
   id,
   ...rest
 }: SelectProps) {
-  const selectId = id ?? label?.toLowerCase().replace(/\s/g, "-");
+  const selectId = id ?? label?.toLowerCase().replace(/\s/g, '-');
   return (
     <div className="w-full">
       {label && (
@@ -36,7 +36,7 @@ export default function Select({
       )}
       <select
         id={selectId}
-        className={`w-full appearance-none rounded-xl border border-[var(--glass-border)] bg-white/80 px-4 py-3 text-[var(--foreground)] focus:border-[var(--point)] focus:outline-none focus:ring-2 focus:ring-[var(--point)]/20 ${className}`}
+        className={`w-full appearance-none rounded-xl border border-[var(--glass-border)] bg-white/80 px-4 py-3 text-[var(--foreground)] focus:border-[var(--point)] focus:ring-2 focus:ring-[var(--point)]/20 focus:outline-none ${className}`}
         {...rest}
       >
         {placeholder && (
