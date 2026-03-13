@@ -14,6 +14,9 @@ alwaysApply: false
 |---|---|---|
 | `<input>` | `<Input>` | `@/components/ui/Input` |
 | `<input type="search">` | `<SearchBar>` | `@/components/ui/SearchBar` |
+| `<textarea>` | `<Textarea>` | `@/components/ui/Textarea` |
+| `<select>` | `<Select>` | `@/components/ui/Select` |
+| `<button>` | `<Button>` | `@/components/ui/Button` |
 | `<div>` (카드/패널) | `<GlassCard>` | `@/components/ui/GlassCard` |
 | chevron/화살표 아이콘 | `<ChevronIcon>` | `@/components/ui/ChevronIcon` |
 
