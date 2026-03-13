@@ -32,3 +32,20 @@ export const DIFFICULTY_OPTIONS = [
   { value: "medium", label: "보통" },
   { value: "hard", label: "어려움" },
 ] as const;
+
+export const RECIPE_DETAIL_PAGE = {
+  EDIT_BUTTON: "수정",
+  INGREDIENTS_TITLE: "재료",
+  STEPS_TITLE: "조리 방법",
+  NUTRITION_TITLE: "영양 정보 (1인분)",
+  COOK_TIME: "조리 시간",
+  MINUTES: "분",
+  SERVINGS: "인분",
+  DIFFICULTY: "난이도",
+  SOURCE_URL: "출처",
+} as const;
+
+export const RECIPE_EDIT_PAGE = {
+  TITLE: "레시피 수정",
+  SAVE_BUTTON: "수정 완료",
+} as const;

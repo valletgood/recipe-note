@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import UrlAnalyzeSection from "@/components/recipe/form/UrlAnalyzeSection";
 import BasicInfoSection from "@/components/recipe/form/BasicInfoSection";
@@ -9,13 +10,18 @@ import CookingStepsSection from "@/components/recipe/form/CookingStepsSection";
 import NutritionSection from "@/components/recipe/form/NutritionSection";
 import Button from "@/components/ui/Button";
 import { ADD_RECIPE_PAGE, NAV } from "@/constants/ui";
-import { useAnalyzeRecipe } from "@/api/recipe/hooks";
+import { useAnalyzeRecipe, useCreateRecipe } from "@/api/recipe/hooks";
 import type { BasicInfoData } from "@/components/recipe/form/BasicInfoSection";
 import type { NutritionData } from "@/components/recipe/form/NutritionSection";
 import type { Ingredient, CookingStep } from "@/types/recipe";
+import type { RecipeCategoryValue } from "@/constants/recipe-categories";
 
 export default function NewRecipePage() {
+  const router = useRouter();
   const analyzeMutation = useAnalyzeRecipe();
+  const createMutation = useCreateRecipe();
+
+  const [sourceUrl, setSourceUrl] = useState<string>("");
 
   const [basicInfo, setBasicInfo] = useState<BasicInfoData>({
     title: "",
@@ -43,6 +49,7 @@ export default function NewRecipePage() {
 
   const handleAnalyze = useCallback(
     (url: string) => {
+      setSourceUrl(url);
       analyzeMutation.mutate(
         { url },
         {
@@ -78,14 +85,39 @@ export default function NewRecipePage() {
   );
 
   const handleSave = useCallback(() => {
-    // TODO: 저장 API 연동
-    console.log({
-      basicInfo,
-      ingredients,
-      cookingSteps,
-      nutrition,
-    });
-  }, [basicInfo, ingredients, cookingSteps, nutrition]);
+    if (!basicInfo.title.trim()) return;
+
+    const nutritionData = nutrition.calories
+      ? {
+          calories: Number(nutrition.calories),
+          carbohydrates: Number(nutrition.carbohydrates),
+          protein: Number(nutrition.protein),
+          fat: Number(nutrition.fat),
+        }
+      : undefined;
+
+    createMutation.mutate(
+      {
+        title: basicInfo.title,
+        description: basicInfo.description || undefined,
+        category: basicInfo.category as RecipeCategoryValue,
+        difficulty: basicInfo.difficulty as "easy" | "medium" | "hard",
+        cookTimeMinutes: Number(basicInfo.cookTimeMinutes),
+        servingCount: Number(basicInfo.servingCount),
+        ingredients,
+        cookingSteps,
+        nutrition: nutritionData,
+        sourceType: sourceUrl ? "url" : "manual",
+        sourceUrl: sourceUrl || undefined,
+      },
+      {
+        onSuccess: (result) => {
+          if (result.error !== 0) return;
+          router.push("/");
+        },
+      }
+    );
+  }, [basicInfo, ingredients, cookingSteps, nutrition, sourceUrl, createMutation, router]);
 
   return (
     <div className="relative z-10 min-h-screen">
@@ -172,11 +204,23 @@ export default function NewRecipePage() {
             className="animate-[staggerFade_0.4s_ease-out_both] pb-8"
             style={{ animationDelay: "0.3s" }}
           >
+            {createMutation.data && createMutation.data.error !== 0 && (
+              <p className="mb-3 text-center text-sm text-red-500">
+                {createMutation.data.message}
+              </p>
+            )}
+            {createMutation.isError && (
+              <p className="mb-3 text-center text-sm text-red-500">
+                레시피 저장 중 오류가 발생했습니다. 다시 시도해주세요.
+              </p>
+            )}
             <Button
               type="button"
               size="lg"
               className="w-full"
               onClick={handleSave}
+              isLoading={createMutation.isPending}
+              disabled={createMutation.isPending || !basicInfo.title.trim()}
             >
               {ADD_RECIPE_PAGE.SAVE_BUTTON}
             </Button>
