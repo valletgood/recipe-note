@@ -13,7 +13,7 @@ export interface SessionPayload {
 
 /** 30일 세션 토큰 생성 (서버 전용) */
 export async function createSessionToken(payload: SessionPayload): Promise<string> {
-  return new SignJWT(payload)
+  return new SignJWT(payload as unknown as Record<string, unknown>)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('30d')
