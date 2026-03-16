@@ -8,12 +8,55 @@ import CookingStepsSection from '@/components/recipe/form/CookingStepsSection';
 import NutritionSection from '@/components/recipe/form/NutritionSection';
 import Button from '@/components/ui/Button';
 import PageNav from '@/components/layout/PageNav';
-import { ADD_RECIPE_PAGE, NAV, RECIPE_EDIT_PAGE } from '@/constants/ui';
+import { NAV, RECIPE_EDIT_PAGE } from '@/constants/ui';
 import { useUpdateRecipe } from '@/api/recipe/hooks';
 import type { BasicInfoData } from '@/components/recipe/form/BasicInfoSection';
 import type { NutritionData } from '@/components/recipe/form/NutritionSection';
 import type { Ingredient, CookingStep, Recipe } from '@/types/recipe';
 import type { RecipeCategoryValue } from '@/constants/recipe-categories';
+import { AuthGuard } from '../auth/AuthGuard';
+
+const STAGGER_ANIMATION_BASE = 'animate-[staggerFade_0.4s_ease-out_both]';
+const STAGGER_DELAY_CLASSES = [
+  '',
+  'animation-delay-[0.06s]',
+  'animation-delay-[0.12s]',
+  'animation-delay-[0.18s]',
+  'animation-delay-[0.24s]',
+] as const;
+
+function getInitialBasicInfo(recipe: Recipe): BasicInfoData {
+  return {
+    title: recipe.title,
+    description: recipe.description ?? '',
+    category: recipe.category ?? '',
+    difficulty: recipe.difficulty ?? '',
+    cookTimeMinutes: String(recipe.cookTimeMinutes ?? ''),
+    servingCount: String(recipe.servingCount ?? ''),
+  };
+}
+
+function getInitialIngredients(recipe: Recipe): Ingredient[] {
+  return recipe.ingredients?.length
+    ? recipe.ingredients
+    : [{ name: '', amount: '', unit: '' }];
+}
+
+function getInitialCookingSteps(recipe: Recipe): CookingStep[] {
+  return recipe.cookingSteps?.length
+    ? recipe.cookingSteps
+    : [{ order: 1, description: '', tip: '' }];
+}
+
+function getInitialNutrition(recipe: Recipe): NutritionData {
+  const info = recipe.nutritionInfo;
+  return {
+    calories: info?.calories != null ? String(info.calories) : '',
+    carbohydrates: info?.carbohydrates != null ? String(info.carbohydrates) : '',
+    protein: info?.protein != null ? String(info.protein) : '',
+    fat: info?.fat != null ? String(info.fat) : '',
+  };
+}
 
 interface RecipeEditFormProps {
   recipe: Recipe;
@@ -23,39 +66,18 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
   const router = useRouter();
   const updateMutation = useUpdateRecipe();
 
-  const [basicInfo, setBasicInfo] = useState<BasicInfoData>({
-    title: recipe.title,
-    description: recipe.description ?? '',
-    category: recipe.category ?? '',
-    difficulty: recipe.difficulty ?? '',
-    cookTimeMinutes: String(recipe.cookTimeMinutes ?? ''),
-    servingCount: String(recipe.servingCount ?? ''),
-  });
-
-  const [ingredients, setIngredients] = useState<Ingredient[]>(
-    recipe.ingredients?.length
-      ? recipe.ingredients
-      : [{ name: '', amount: '', unit: '' }],
+  const [basicInfo, setBasicInfo] = useState<BasicInfoData>(() =>
+    getInitialBasicInfo(recipe),
   );
-
-  const [cookingSteps, setCookingSteps] = useState<CookingStep[]>(
-    recipe.cookingSteps?.length
-      ? recipe.cookingSteps
-      : [{ order: 1, description: '', tip: '' }],
+  const [ingredients, setIngredients] = useState<Ingredient[]>(() =>
+    getInitialIngredients(recipe),
   );
-
-  const [nutrition, setNutrition] = useState<NutritionData>({
-    calories: recipe.nutritionInfo?.calories
-      ? String(recipe.nutritionInfo.calories)
-      : '',
-    carbohydrates: recipe.nutritionInfo?.carbohydrates
-      ? String(recipe.nutritionInfo.carbohydrates)
-      : '',
-    protein: recipe.nutritionInfo?.protein
-      ? String(recipe.nutritionInfo.protein)
-      : '',
-    fat: recipe.nutritionInfo?.fat ? String(recipe.nutritionInfo.fat) : '',
-  });
+  const [cookingSteps, setCookingSteps] = useState<CookingStep[]>(() =>
+    getInitialCookingSteps(recipe),
+  );
+  const [nutrition, setNutrition] = useState<NutritionData>(() =>
+    getInitialNutrition(recipe),
+  );
 
   const handleSave = useCallback(() => {
     if (!basicInfo.title.trim()) return;
@@ -105,22 +127,46 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
     router,
   ]);
 
+  const isSaveDisabled =
+    updateMutation.isPending || !basicInfo.title.trim();
+  const saveButtonCommon = {
+    onClick: handleSave,
+    isLoading: updateMutation.isPending,
+    disabled: isSaveDisabled,
+  };
+
+  const errorMessage =
+    updateMutation.isError
+      ? RECIPE_EDIT_PAGE.EDIT_ERROR_MESSAGE
+      : updateMutation.data && updateMutation.data.error !== 0
+        ? updateMutation.data.message
+        : null;
+
   return (
-    <>
+    <AuthGuard>
       <PageNav
-        backHref={`/recipes/${recipe.id}`}
+        backHref="/"
         backLabel={NAV.BACK_TO_LIST}
+        button={
+          <Button
+            variant="ghost"
+            size="sm"
+            className="underline"
+            {...saveButtonCommon}
+          >
+            {RECIPE_EDIT_PAGE.EDIT_BUTTON}
+          </Button>
+        }
       />
 
       <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
         <div className="space-y-6">
-          <div className="animate-[staggerFade_0.4s_ease-out_both]">
+          <div className={STAGGER_ANIMATION_BASE}>
             <BasicInfoSection data={basicInfo} onChange={setBasicInfo} />
           </div>
 
           <div
-            className="animate-[staggerFade_0.4s_ease-out_both]"
-            style={{ animationDelay: '0.06s' }}
+            className={`${STAGGER_ANIMATION_BASE} ${STAGGER_DELAY_CLASSES[1]}`}
           >
             <IngredientsSection
               ingredients={ingredients}
@@ -129,8 +175,7 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
           </div>
 
           <div
-            className="animate-[staggerFade_0.4s_ease-out_both]"
-            style={{ animationDelay: '0.12s' }}
+            className={`${STAGGER_ANIMATION_BASE} ${STAGGER_DELAY_CLASSES[2]}`}
           >
             <CookingStepsSection
               steps={cookingSteps}
@@ -139,39 +184,30 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
           </div>
 
           <div
-            className="animate-[staggerFade_0.4s_ease-out_both]"
-            style={{ animationDelay: '0.18s' }}
+            className={`${STAGGER_ANIMATION_BASE} ${STAGGER_DELAY_CLASSES[3]}`}
           >
             <NutritionSection data={nutrition} onChange={setNutrition} />
           </div>
 
           <div
-            className="animate-[staggerFade_0.4s_ease-out_both] pb-8"
-            style={{ animationDelay: '0.24s' }}
+            className={`${STAGGER_ANIMATION_BASE} ${STAGGER_DELAY_CLASSES[4]} pb-8`}
           >
-            {updateMutation.data && updateMutation.data.error !== 0 && (
+            {errorMessage && (
               <p className="mb-3 text-center text-sm text-red-500">
-                {updateMutation.data.message}
-              </p>
-            )}
-            {updateMutation.isError && (
-              <p className="mb-3 text-center text-sm text-red-500">
-                수정 중 오류가 발생했습니다. 다시 시도해주세요.
+                {errorMessage}
               </p>
             )}
             <Button
-              type="button"
+              variant="primary"
               size="lg"
               className="w-full"
-              onClick={handleSave}
-              isLoading={updateMutation.isPending}
-              disabled={updateMutation.isPending || !basicInfo.title.trim()}
+              {...saveButtonCommon}
             >
-              {RECIPE_EDIT_PAGE.SAVE_BUTTON}
+              {RECIPE_EDIT_PAGE.EDIT_BUTTON}
             </Button>
           </div>
         </div>
       </main>
-    </>
+    </AuthGuard>
   );
 }
