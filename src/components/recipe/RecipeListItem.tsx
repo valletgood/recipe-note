@@ -9,6 +9,7 @@ import ChevronIcon from '@/components/ui/ChevronIcon';
 import DetailIcon from '@/components/ui/DetailIcon';
 import PencilIcon from '@/components/ui/PencilIcon';
 import TrashIcon from '@/components/ui/TrashIcon';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 
 interface RecipeListItemProps {
   recipe: Recipe;
@@ -17,22 +18,47 @@ interface RecipeListItemProps {
 export default function RecipeListItem({ recipe }: RecipeListItemProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDeletedModal, setShowDeletedModal] = useState(false);
   const deleteMutation = useDeleteRecipe();
 
   const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
 
   const handleDelete = useCallback(() => {
-    if (!confirm(`"${recipe.title}" 레시피를 삭제할까요?`)) return;
+    setShowDeleteModal(false);
     deleteMutation.mutate(recipe.id, {
       onSuccess: (res) => {
-        if (res.error === 0) router.refresh();
+        if (res.error === 0) setShowDeletedModal(true);
       },
     });
-  }, [recipe.id, recipe.title, deleteMutation, router]);
+  }, [recipe.id, deleteMutation]);
+
+  const handleDeletedConfirm = useCallback(() => {
+    setShowDeletedModal(false);
+    router.refresh();
+  }, [router]);
 
   const ingredients = recipe.ingredients ?? [];
 
   return (
+    <>
+    <ConfirmModal
+      open={showDeleteModal}
+      title={`"${recipe.title}" 레시피를 삭제할까요?`}
+      description="삭제한 레시피는 복구할 수 없어요."
+      confirmLabel="삭제"
+      destructive
+      onConfirm={handleDelete}
+      onCancel={() => setShowDeleteModal(false)}
+    />
+    <ConfirmModal
+      open={showDeletedModal}
+      title="레시피가 삭제됐어요"
+      confirmLabel="확인"
+      hideCancel
+      onConfirm={handleDeletedConfirm}
+      onCancel={handleDeletedConfirm}
+    />
     <div className="glass rounded-xl transition-shadow hover:shadow-[var(--glass-shadow)]">
       {/* Header row */}
       <div className="flex items-center justify-between gap-3 px-5 py-4">
@@ -53,22 +79,6 @@ export default function RecipeListItem({ recipe }: RecipeListItemProps) {
 
         {/* 우측 아이콘 버튼 그룹 */}
         <div className="flex shrink-0 items-center gap-1">
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={deleteMutation.isPending}
-            className="rounded-lg p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
-            aria-label="레시피 삭제"
-          >
-            <TrashIcon className="h-5 w-5" />
-          </button>
-          <Link
-            href={`/recipes/${recipe.id}/edit`}
-            className="rounded-lg p-2 text-[var(--point-muted)] transition-colors hover:bg-[var(--point-bg)] hover:text-[var(--point)]"
-            aria-label="레시피 수정"
-          >
-            <PencilIcon className="h-5 w-5" />
-          </Link>
           <Link
             href={`/recipes/${recipe.id}`}
             className="rounded-lg p-2 text-[var(--point-muted)] transition-colors hover:bg-[var(--point-bg)] hover:text-[var(--point)]"
@@ -76,6 +86,22 @@ export default function RecipeListItem({ recipe }: RecipeListItemProps) {
           >
             <DetailIcon className="h-5 w-5" />
           </Link>
+          <Link
+            href={`/recipes/${recipe.id}/edit`}
+            className="rounded-lg p-2 text-[var(--point-muted)] transition-colors hover:bg-[var(--point-bg)] hover:text-[var(--point)]"
+            aria-label="레시피 수정"
+          >
+            <PencilIcon className="h-5 w-5" />
+          </Link>
+          <button
+            type="button"
+            onClick={() => setShowDeleteModal(true)}
+            disabled={deleteMutation.isPending}
+            className="rounded-lg p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+            aria-label="레시피 삭제"
+          >
+            <TrashIcon className="h-5 w-5" />
+          </button>
         </div>
       </div>
 
@@ -110,5 +136,6 @@ export default function RecipeListItem({ recipe }: RecipeListItemProps) {
         </div>
       </div>
     </div>
+    </>
   );
 }
