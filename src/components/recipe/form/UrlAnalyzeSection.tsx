@@ -3,6 +3,7 @@
 import { useCallback, useState } from 'react';
 import GlassCard from '@/components/ui/GlassCard';
 import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 import { ADD_RECIPE_PAGE } from '@/constants/ui';
 import { RaccoonLoco } from '@/components/character/RaccoonLoco';
 
@@ -58,12 +59,12 @@ export default function UrlAnalyzeSection({
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
         <div className="relative min-w-0 flex-1">
           <LinkIcon className="absolute top-1/2 left-4 h-4 w-4 -translate-y-1/2 text-[var(--point-muted)]" />
-          <input
+          <Input
             type="url"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder={ADD_RECIPE_PAGE.URL_PLACEHOLDER}
-            className="w-full rounded-xl border border-[var(--glass-border)] bg-white/80 py-3 pr-4 pl-11 text-[var(--foreground)] placeholder:text-[var(--point-muted)] focus:border-[var(--point)] focus:ring-2 focus:ring-[var(--point)]/20 focus:outline-none"
+            className="py-3 pl-11"
             disabled={isAnalyzing}
           />
         </div>

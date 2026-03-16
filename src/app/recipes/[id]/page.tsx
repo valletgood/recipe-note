@@ -204,7 +204,7 @@ function MetaBadge({ label }: { label: string }) {
 
 function NutritionItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-[var(--glass-border)] bg-white/50 px-4 py-3 text-center">
+    <div className="rounded-lg border border-[var(--glass-border)] bg-[var(--glass-bg-strong)] px-4 py-3 text-center">
       <p className="text-xs font-medium text-[var(--point-muted)]">{label}</p>
       <p className="font-display mt-0.5 font-semibold text-[var(--foreground)]">
         {value}

@@ -3,15 +3,19 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from 'stores/authStore';
-import { useThemeStore } from 'stores/themeStore';
 
 export default function FloatingSettingButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const dark = localStorage.getItem('theme') === 'dark';
+    document.body.classList.toggle('theme-dark', dark);
+    return dark;
+  });
   const [showUserInfo, setShowUserInfo] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const { user, logout } = useAuthStore();
-  const { themeDarkMode, toggleThemeDarkMode } = useThemeStore();
 
   // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
@@ -24,6 +28,14 @@ export default function FloatingSettingButton() {
     document.addEventListener('mousedown', handle);
     return () => document.removeEventListener('mousedown', handle);
   }, [isOpen]);
+
+  const handleToggleDark = () => {
+    alert('추후 업데이트 예정입니다.');
+    // const next = !isDark;
+    // setIsDark(next);
+    // document.body.classList.toggle('theme-dark', next);
+    // localStorage.setItem('theme', next ? 'dark' : 'light');
+  };
 
   const handleLogout = () => {
     setIsOpen(false);
@@ -38,7 +50,7 @@ export default function FloatingSettingButton() {
         className="pointer-events-none fixed inset-x-0 bottom-6 z-40"
       >
         <div className="mx-auto max-w-4xl px-4 sm:px-6">
-          <div className="pointer-events-auto flex flex-col items-start gap-2">
+          <div className="pointer-events-auto flex w-fit flex-col items-start gap-2">
             {/* 메뉴 패널 */}
             {isOpen && (
               <div
@@ -46,11 +58,16 @@ export default function FloatingSettingButton() {
                 role="menu"
                 style={{ animation: 'menuIn 0.15s ease-out' }}
               >
-                <MenuItem onClick={toggleThemeDarkMode}>
-                  {themeDarkMode ? '화면 밝게' : '화면 어둡게'}
+                <MenuItem onClick={handleToggleDark}>
+                  {isDark ? '화면 밝게' : '화면 어둡게'}
                 </MenuItem>
                 <div className="mx-3 my-1 border-t border-[var(--glass-border)]" />
-                <MenuItem onClick={() => { setIsOpen(false); setShowUserInfo(true); }}>
+                <MenuItem
+                  onClick={() => {
+                    setIsOpen(false);
+                    setShowUserInfo(true);
+                  }}
+                >
                   내 정보
                 </MenuItem>
                 <MenuItem onClick={handleLogout} destructive>
@@ -141,14 +158,22 @@ function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4">
       <span className="text-sm text-[var(--point-muted)]">{label}</span>
-      <span className="text-sm font-medium text-[var(--foreground)]">{value}</span>
+      <span className="text-sm font-medium text-[var(--foreground)]">
+        {value}
+      </span>
     </div>
   );
 }
 
 function GearIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden>
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      aria-hidden
+    >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"

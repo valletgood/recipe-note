@@ -11,6 +11,7 @@ export function RaccoonCrying({ className }: Props) {
       className={className}
       width={160}
       height={120}
+      style={{ background: 'transparent' }}
     />
   );
 }

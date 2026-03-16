@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
-import { useCallback, useState } from "react";
-import GlassCard from "./GlassCard";
+import { useCallback, useState } from 'react';
+import GlassCard from './GlassCard';
+import Input from './Input';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -14,12 +15,12 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({
-  placeholder = "검색...",
+  placeholder = '검색...',
   onSearch,
   onChange,
   value: controlledValue,
-  defaultValue = "",
-  className = "",
+  defaultValue = '',
+  className = '',
 }: SearchBarProps) {
   const [internalValue, setInternalValue] = useState(defaultValue);
   const isControlled = controlledValue !== undefined;
@@ -30,7 +31,7 @@ export default function SearchBar({
       e.preventDefault();
       onSearch?.(value.trim());
     },
-    [value, onSearch]
+    [value, onSearch],
   );
 
   return (
@@ -38,7 +39,7 @@ export default function SearchBar({
       <GlassCard variant="strong" className="overflow-hidden">
         <div className="flex items-center gap-3 px-4 py-3">
           <SearchIcon className="h-5 w-5 shrink-0 text-[var(--point)]" />
-          <input
+          <Input
             type="search"
             value={value}
             onChange={(e) => {
@@ -48,7 +49,7 @@ export default function SearchBar({
             }}
             placeholder={placeholder}
             aria-label={placeholder}
-            className="min-w-0 flex-1 bg-transparent text-[var(--foreground)] placeholder:text-[var(--point-muted)] focus:outline-none"
+            className={`border-none! bg-transparent! focus:border-none! focus:ring-0! focus:outline-none!`}
           />
         </div>
       </GlassCard>

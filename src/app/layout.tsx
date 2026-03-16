@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, Nunito } from "next/font/google";
 import QueryProvider from "@/lib/query-provider";
+import ThemeApplier from "@/components/ui/ThemeApplier";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -37,7 +38,10 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className={`${outfit.variable} ${nunito.variable} antialiased`}>
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <ThemeApplier />
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );

@@ -40,7 +40,7 @@ export default function Textarea({
       <textarea
         ref={ref}
         id={textareaId}
-        className={`w-full resize-none rounded-xl border border-[var(--glass-border)] bg-white/80 px-4 py-3 text-[var(--foreground)] placeholder:text-[var(--point-muted)] focus:border-[var(--point)] focus:outline-none focus:ring-2 focus:ring-[var(--point)]/20 ${className}`}
+        className={`w-full resize-none rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg-strong)] px-4 py-3 text-[var(--foreground)] placeholder:text-[var(--point-muted)] focus:border-[var(--point)] focus:outline-none focus:ring-2 focus:ring-[var(--point)]/20 ${className}`}
         rows={autoResize ? 1 : 3}
         {...rest}
       />

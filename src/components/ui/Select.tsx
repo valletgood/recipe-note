@@ -36,7 +36,7 @@ export default function Select({
       )}
       <select
         id={selectId}
-        className={`w-full appearance-none rounded-xl border border-[var(--glass-border)] bg-white/80 px-4 py-3 text-[var(--foreground)] focus:border-[var(--point)] focus:ring-2 focus:ring-[var(--point)]/20 focus:outline-none ${className}`}
+        className={`w-full appearance-none rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg-strong)] px-4 py-3 text-[var(--foreground)] focus:border-[var(--point)] focus:ring-2 focus:ring-[var(--point)]/20 focus:outline-none ${className}`}
         {...rest}
       >
         {placeholder && (
