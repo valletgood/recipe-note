@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import UrlAnalyzeSection from '@/components/recipe/form/UrlAnalyzeSection';
@@ -11,6 +11,7 @@ import CookingStepsSection from '@/components/recipe/form/CookingStepsSection';
 import NutritionSection from '@/components/recipe/form/NutritionSection';
 import Button from '@/components/ui/Button';
 import PageNav from '@/components/layout/PageNav';
+import AnalyzingOverlay from '@/components/ui/AnalyzingOverlay';
 import { ADD_RECIPE_PAGE, NAV } from '@/constants/ui';
 import {
   useAnalyzeRecipe,
@@ -31,6 +32,8 @@ export default function NewRecipePage() {
 
   const [analyzeTab, setAnalyzeTab] = useState<'url' | 'image'>('url');
   const [showTutorial, setShowTutorial] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(false);
+  const overlayStartRef = useRef<number>(0);
   const [sourceUrl, setSourceUrl] = useState<string>('');
 
   const [basicInfo, setBasicInfo] = useState<BasicInfoData>({
@@ -57,51 +60,73 @@ export default function NewRecipePage() {
     fat: '',
   });
 
-  const applyAnalysisResult = useCallback((data: AnalyzeRecipeResponse) => {
-    setBasicInfo({
-      title: data.title,
-      description: data.description,
-      category: data.category,
-      difficulty: data.difficulty,
-      cookTimeMinutes: String(data.cookTimeMinutes),
-      servingCount: String(data.servingCount),
-    });
-    setIngredients(data.ingredients);
-    setCookingSteps(data.cookingSteps);
-    setNutrition({
-      calories: String(data.nutrition.calories),
-      carbohydrates: String(data.nutrition.carbohydrates),
-      protein: String(data.nutrition.protein),
-      fat: String(data.nutrition.fat),
-    });
+  const hideOverlayAfterMinDelay = useCallback(() => {
+    const elapsed = Date.now() - overlayStartRef.current;
+    const remaining = Math.max(0, 2000 - elapsed);
+    setTimeout(() => setShowOverlay(false), remaining);
   }, []);
+
+  const applyAnalysisResult = useCallback(
+    (data: AnalyzeRecipeResponse) => {
+      setBasicInfo({
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        difficulty: data.difficulty,
+        cookTimeMinutes: String(data.cookTimeMinutes),
+        servingCount: String(data.servingCount),
+      });
+      setIngredients(data.ingredients);
+      setCookingSteps(data.cookingSteps);
+      setNutrition({
+        calories: String(data.nutrition.calories),
+        carbohydrates: String(data.nutrition.carbohydrates),
+        protein: String(data.nutrition.protein),
+        fat: String(data.nutrition.fat),
+      });
+      hideOverlayAfterMinDelay();
+    },
+    [hideOverlayAfterMinDelay],
+  );
 
   const handleAnalyze = useCallback(
     (url: string) => {
       setSourceUrl(url);
+      setShowOverlay(true);
+      overlayStartRef.current = Date.now();
       analyzeMutation.mutate(
         { url },
         {
           onSuccess: (result) => {
-            if (result.error !== 0 || !result.data) return;
+            if (result.error !== 0 || !result.data) {
+              hideOverlayAfterMinDelay();
+              return;
+            }
             applyAnalysisResult(result.data);
           },
+          onError: () => hideOverlayAfterMinDelay(),
         },
       );
     },
-    [analyzeMutation, applyAnalysisResult],
+    [analyzeMutation, applyAnalysisResult, hideOverlayAfterMinDelay],
   );
 
   const handleAnalyzeImage = useCallback(
     (file: File) => {
+      setShowOverlay(true);
+      overlayStartRef.current = Date.now();
       analyzeImageMutation.mutate(file, {
         onSuccess: (result) => {
-          if (result.error !== 0 || !result.data) return;
+          if (result.error !== 0 || !result.data) {
+            hideOverlayAfterMinDelay();
+            return;
+          }
           applyAnalysisResult(result.data);
         },
+        onError: () => hideOverlayAfterMinDelay(),
       });
     },
-    [analyzeImageMutation, applyAnalysisResult],
+    [analyzeImageMutation, applyAnalysisResult, hideOverlayAfterMinDelay],
   );
 
   const handleSave = useCallback(() => {
@@ -132,8 +157,8 @@ export default function NewRecipePage() {
       },
       {
         onSuccess: (result) => {
-          if (result.error !== 0) return;
-          router.push('/');
+          if (result.error !== 0 || !result.data) return;
+          router.push(`/recipes/${result.data.id}/complete`);
         },
       },
     );
@@ -149,9 +174,10 @@ export default function NewRecipePage() {
 
   return (
     <div className="relative z-10 min-h-screen">
+      <AnalyzingOverlay visible={showOverlay} />
       <PageNav backHref="/" backLabel={NAV.BACK_TO_LIST} />
 
-      <main className="mx-auto max-w-3xl px-4 sm:px-6">
+      <main className="mx-auto max-w-3xl px-4 pt-6 sm:px-6">
         <div className="space-y-6">
           {/* 분석 섹션 (탭) */}
           <div className="animate-[staggerFade_0.4s_ease-out_both]">
@@ -175,7 +201,7 @@ export default function NewRecipePage() {
                 type="button"
                 onClick={() => setShowTutorial((v) => !v)}
                 aria-label="사용 방법 보기"
-                className="ml-auto flex h-7 w-7 items-center justify-center rounded-full bg-[var(--point-bg)] text-[var(--point)] transition-colors hover:bg-[var(--point-pale)]"
+                className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--point-bg)] text-[var(--point)] transition-colors hover:bg-[var(--point-pale)]"
               >
                 <svg
                   width="15"
@@ -211,7 +237,7 @@ export default function NewRecipePage() {
                         레시피 주소
                       </strong>{' '}
                       — 레시피 블로그나 사이트의 URL을 붙여넣고 분석 버튼을
-                      누르면 AI가 레시피를 자동으로 추출해요.
+                      누르면 구리가 레시피를 자동으로 추출해요.
                     </span>
                   </li>
                   <li className="flex gap-2">
@@ -222,7 +248,7 @@ export default function NewRecipePage() {
                       <strong className="text-[var(--foreground)]">
                         레시피 이미지
                       </strong>{' '}
-                      — 레시피가 담긴 사진이나 스크린샷을 올리면 AI가 이미지를
+                      — 레시피가 담긴 사진이나 스크린샷을 올리면 구리가 이미지를
                       읽고 레시피를 정리해요. 한 장만 업로드할 수 있어요.
                     </span>
                   </li>

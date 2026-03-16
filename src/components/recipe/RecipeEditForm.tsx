@@ -89,7 +89,7 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
       {
         onSuccess: (result) => {
           if (result.error !== 0) return;
-          router.push(`/recipes/${recipe.id}`);
+          router.push(`/recipes/${recipe.id}/complete?from=edit`);
         },
       },
     );
