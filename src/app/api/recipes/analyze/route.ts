@@ -12,7 +12,7 @@ const recipeSchema = z.object({
   category: z
     .enum(categoryValues as [string, ...string[]])
     .describe(
-      "음식 카테고리. soup_stew(국/찌개), stir_fry(볶음), grill(구이), braise(조림), steam(찜), jeon(전/부침), bibim(비빔), muchim(무침), noodle(면), rice(밥) 중 하나"
+      "음식 카테고리. soup_stew(국/찌개), stir_fry(볶음), grill(구이), braise(조림), steam(찜), jeon(전/부침), bibim(비빔), muchim(무침), noodle(면), rice(밥), dessert(디저트) 중 하나"
     ),
   difficulty: z
     .enum(["easy", "medium", "hard"])
@@ -234,7 +234,7 @@ export async function POST(request: Request) {
 - 조리 단계는 원문의 순서를 따르되, 자연스럽게 다시 정리해주세요
 - 유용한 조리 팁이 있으면 tip 필드에 넣어주세요 (없으면 빈 문자열)
 - 영양 정보는 재료와 분량을 기반으로 1인분 기준으로 추정해주세요
-- 카테고리는 반드시 다음 중 하나를 선택하세요: soup_stew(국/찌개), stir_fry(볶음), grill(구이), braise(조림), steam(찜), jeon(전/부침), bibim(비빔), muchim(무침), noodle(면), rice(밥)
+- 카테고리는 반드시 다음 중 하나를 선택하세요: soup_stew(국/찌개), stir_fry(볶음), grill(구이), braise(조림), steam(찜), jeon(전/부침), bibim(비빔), muchim(무침), noodle(면), rice(밥), dessert(디저트)
 - 모든 필드를 빠짐없이 채워주세요
 
 ## 저작권 주의

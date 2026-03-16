@@ -13,6 +13,7 @@ export const RECIPE_CATEGORIES = [
   { value: "muchim", label: "무침" },
   { value: "noodle", label: "면" },
   { value: "rice", label: "밥" },
+  { value: "dessert", label: "디저트" },
 ] as const;
 
 export type RecipeCategoryValue =
