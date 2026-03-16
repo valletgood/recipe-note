@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useCallback, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import type { Recipe } from "@/types/recipe";
-import { useDeleteRecipe } from "@/api/recipe/hooks";
-import ChevronIcon from "@/components/ui/ChevronIcon";
-import DetailIcon from "@/components/ui/DetailIcon";
-import PencilIcon from "@/components/ui/PencilIcon";
-import TrashIcon from "@/components/ui/TrashIcon";
+import { useCallback, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import type { Recipe } from '@/types/recipe';
+import { useDeleteRecipe } from '@/api/recipe/hooks';
+import ChevronIcon from '@/components/ui/ChevronIcon';
+import DetailIcon from '@/components/ui/DetailIcon';
+import PencilIcon from '@/components/ui/PencilIcon';
+import TrashIcon from '@/components/ui/TrashIcon';
 
 interface RecipeListItemProps {
   recipe: Recipe;
@@ -44,7 +44,7 @@ export default function RecipeListItem({ recipe }: RecipeListItemProps) {
           aria-expanded={isOpen}
         >
           <ChevronIcon
-            className={`h-4 w-4 shrink-0 text-[var(--point-muted)] transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`}
+            className={`h-4 w-4 shrink-0 text-[var(--point-muted)] transition-transform duration-200 ${isOpen ? 'rotate-90' : ''}`}
           />
           <span className="font-display truncate text-base font-semibold text-[var(--foreground)]">
             {recipe.title}
@@ -81,22 +81,22 @@ export default function RecipeListItem({ recipe }: RecipeListItemProps) {
 
       {/* Accordion panel — 재료 목록 */}
       <div
-        className={`accordion-panel ${isOpen ? "accordion-panel-open" : ""}`}
+        className={`accordion-panel ${isOpen ? 'accordion-panel-open' : ''}`}
         aria-hidden={!isOpen}
       >
-        <div className="border-t border-[var(--glass-border)] px-5 pb-4 pt-3">
+        <div className="border-t border-[var(--glass-border)] px-5 pt-3 pb-4">
           {ingredients.length > 0 ? (
             <ul className="flex flex-wrap gap-2">
-              {ingredients.map((ing) => (
+              {ingredients.map((ing, index) => (
                 <li
-                  key={ing.name}
+                  key={`${ing.name}-${index}`}
                   className="rounded-full bg-[var(--point-bg)] px-3 py-1 text-sm text-[var(--point)]"
                 >
                   <span className="font-medium">{ing.name}</span>
                   {ing.amount && (
                     <span className="ml-1 text-[var(--point-muted)]">
                       {ing.amount}
-                      {ing.unit ?? ""}
+                      {ing.unit ?? ''}
                     </span>
                   )}
                 </li>
