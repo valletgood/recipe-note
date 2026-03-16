@@ -1,7 +1,8 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Outfit, Nunito } from 'next/font/google';
 import QueryProvider from '@/lib/query-provider';
 import ThemeApplier from '@/components/ui/ThemeApplier';
+import ScrollToTop from '@/components/ui/ScrollToTop';
 import './globals.css';
 
 const outfit = Outfit({
@@ -15,6 +16,13 @@ const nunito = Nunito({
   subsets: ['latin'],
   display: 'swap',
 });
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export const metadata: Metadata = {
   title: 'Recipe Note | 레시피 저장',
@@ -44,6 +52,7 @@ export default function RootLayout({
       <body className={`${outfit.variable} ${nunito.variable} antialiased`}>
         <QueryProvider>
           <ThemeApplier />
+          <ScrollToTop />
           {children}
         </QueryProvider>
       </body>
