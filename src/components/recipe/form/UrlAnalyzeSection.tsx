@@ -31,9 +31,9 @@ export default function UrlAnalyzeSection({
   return (
     <GlassCard variant="strong" className="p-6">
       <h2 className="font-display mb-4 text-lg font-bold text-[var(--point)]">
-        {ADD_RECIPE_PAGE.URL_SECTION_TITLE}
+        레시피 주소
       </h2>
-      <form onSubmit={handleSubmit} className="flex gap-3">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
         <div className="relative min-w-0 flex-1">
           <LinkIcon className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--point-muted)]" />
           <input
@@ -50,12 +50,18 @@ export default function UrlAnalyzeSection({
           disabled={!url.trim()}
           isLoading={isAnalyzing}
           size="lg"
+          className="w-full sm:w-auto"
         >
           {isAnalyzing
             ? ADD_RECIPE_PAGE.URL_ANALYZING
             : ADD_RECIPE_PAGE.URL_ANALYZE_BUTTON}
         </Button>
       </form>
+      {isAnalyzing && (
+        <p className="mt-3 text-sm text-[var(--point-muted)]">
+          화면을 이동하거나 종료하지 말고 기다려주세요
+        </p>
+      )}
       {errorMessage && (
         <p className="mt-3 text-sm text-red-500">{errorMessage}</p>
       )}

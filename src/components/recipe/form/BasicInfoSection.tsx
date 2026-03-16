@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import Input from "@/components/ui/Input";
-import Textarea from "@/components/ui/Textarea";
-import Select from "@/components/ui/Select";
-import GlassCard from "@/components/ui/GlassCard";
-import { ADD_RECIPE_PAGE, DIFFICULTY_OPTIONS } from "@/constants/ui";
-import { RECIPE_CATEGORIES } from "@/constants/recipe-categories";
-import type { RecipeCategoryValue } from "@/constants/recipe-categories";
+import Input from '@/components/ui/Input';
+import Textarea from '@/components/ui/Textarea';
+import Select from '@/components/ui/Select';
+import GlassCard from '@/components/ui/GlassCard';
+import { ADD_RECIPE_PAGE, DIFFICULTY_OPTIONS } from '@/constants/ui';
+import { RECIPE_CATEGORIES } from '@/constants/recipe-categories';
+import type { RecipeCategoryValue } from '@/constants/recipe-categories';
 
 interface BasicInfoData {
   title: string;
   description: string;
-  category: RecipeCategoryValue | "";
-  difficulty: "easy" | "medium" | "hard" | "";
+  category: RecipeCategoryValue | '';
+  difficulty: 'easy' | 'medium' | 'hard' | '';
   cookTimeMinutes: string;
   servingCount: string;
 }
@@ -28,7 +28,7 @@ export default function BasicInfoSection({
 }: BasicInfoSectionProps) {
   const update = <K extends keyof BasicInfoData>(
     key: K,
-    value: BasicInfoData[K]
+    value: BasicInfoData[K],
   ) => {
     onChange({ ...data, [key]: value });
   };
@@ -44,14 +44,15 @@ export default function BasicInfoSection({
           label="레시피 이름"
           placeholder={ADD_RECIPE_PAGE.TITLE_PLACEHOLDER}
           value={data.title}
-          onChange={(e) => update("title", e.target.value)}
+          onChange={(e) => update('title', e.target.value)}
         />
 
         <Textarea
           label="설명"
           placeholder={ADD_RECIPE_PAGE.DESCRIPTION_PLACEHOLDER}
           value={data.description}
-          onChange={(e) => update("description", e.target.value)}
+          rows={5}
+          onChange={(e) => update('description', e.target.value)}
         />
 
         <div className="grid grid-cols-2 gap-4">
@@ -61,7 +62,7 @@ export default function BasicInfoSection({
             placeholder="카테고리 선택"
             value={data.category}
             onChange={(e) =>
-              update("category", e.target.value as RecipeCategoryValue | "")
+              update('category', e.target.value as RecipeCategoryValue | '')
             }
           />
           <Select
@@ -71,8 +72,8 @@ export default function BasicInfoSection({
             value={data.difficulty}
             onChange={(e) =>
               update(
-                "difficulty",
-                e.target.value as "easy" | "medium" | "hard" | ""
+                'difficulty',
+                e.target.value as 'easy' | 'medium' | 'hard' | '',
               )
             }
           />
@@ -85,7 +86,7 @@ export default function BasicInfoSection({
             placeholder="25"
             min={0}
             value={data.cookTimeMinutes}
-            onChange={(e) => update("cookTimeMinutes", e.target.value)}
+            onChange={(e) => update('cookTimeMinutes', e.target.value)}
           />
           <Input
             label="인분 수"
@@ -93,7 +94,7 @@ export default function BasicInfoSection({
             placeholder="2"
             min={1}
             value={data.servingCount}
-            onChange={(e) => update("servingCount", e.target.value)}
+            onChange={(e) => update('servingCount', e.target.value)}
           />
         </div>
       </div>

@@ -2,7 +2,6 @@
 
 import { useCallback } from "react";
 import Textarea from "@/components/ui/Textarea";
-import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import GlassCard from "@/components/ui/GlassCard";
 import { ADD_RECIPE_PAGE } from "@/constants/ui";
@@ -75,12 +74,16 @@ export default function CookingStepsSection({
               onChange={(e) =>
                 updateStep(index, "description", e.target.value)
               }
+              autoResize
+              rows={5}
             />
             <div className="mt-2">
-              <Input
+              <Textarea
                 placeholder="팁 (선택사항)"
                 value={step.tip ?? ""}
                 onChange={(e) => updateStep(index, "tip", e.target.value)}
+                autoResize
+                rows={2}
               />
             </div>
           </div>
