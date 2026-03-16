@@ -1,19 +1,36 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "@/db";
 import { recipes } from "@/db/schema";
 import { successResponse, errorResponse, ErrorCode } from "@/lib/api-response";
+import { verifySessionToken } from "@/lib/session";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
-export async function DELETE(_request: Request, { params }: RouteParams) {
+async function getSessionUuid(request: Request): Promise<string | null> {
+  const authHeader = request.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) return null;
   try {
+    const session = await verifySessionToken(authHeader.slice(7));
+    return session.uuid;
+  } catch {
+    return null;
+  }
+}
+
+export async function DELETE(request: Request, { params }: RouteParams) {
+  try {
+    const userUuid = await getSessionUuid(request);
+    if (!userUuid) {
+      return errorResponse(ErrorCode.UNAUTHORIZED, "로그인이 필요합니다.");
+    }
+
     const { id } = await params;
 
     const [deleted] = await db
       .delete(recipes)
-      .where(eq(recipes.id, id))
+      .where(and(eq(recipes.id, id), eq(recipes.userUuid, userUuid)))
       .returning({ id: recipes.id });
 
     if (!deleted) {
@@ -30,6 +47,11 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
 
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
+    const userUuid = await getSessionUuid(request);
+    if (!userUuid) {
+      return errorResponse(ErrorCode.UNAUTHORIZED, "로그인이 필요합니다.");
+    }
+
     const { id } = await params;
     const body = await request.json();
 
@@ -97,7 +119,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
         sourceUrl: sourceUrl || null,
         updatedAt: new Date(),
       })
-      .where(eq(recipes.id, id))
+      .where(and(eq(recipes.id, id), eq(recipes.userUuid, userUuid)))
       .returning();
 
     if (!updated) {

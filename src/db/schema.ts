@@ -11,6 +11,7 @@ import {
 
 export const recipes = pgTable('recipes', {
   id: uuid('id').defaultRandom().primaryKey(),
+  userUuid: uuid('user_uuid'),
   title: varchar('title', { length: 255 }).notNull(),
   description: text('description'),
   category: varchar('category', { length: 50 }).notNull(),

@@ -212,7 +212,7 @@ export default function SignupPage() {
                 disabled={!canSubmit}
                 isLoading={signupMutation.isPending}
                 className="mt-1 h-12 w-full"
-                onCanPlay={handleSubmit}
+                onClick={handleSubmit}
               >
                 회원가입
               </Button>

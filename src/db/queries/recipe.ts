@@ -33,6 +33,16 @@ export async function getAllRecipes(): Promise<Recipe[]> {
   return rows.map(rowToRecipe);
 }
 
+export async function getRecipesByUserUuid(userUuid: string): Promise<Recipe[]> {
+  const rows = await db
+    .select()
+    .from(recipes)
+    .where(eq(recipes.userUuid, userUuid))
+    .orderBy(desc(recipes.createdAt));
+
+  return rows.map(rowToRecipe);
+}
+
 export async function getRecipeById(id: string): Promise<Recipe | null> {
   const [row] = await db
     .select()
