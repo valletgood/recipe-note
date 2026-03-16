@@ -4,7 +4,8 @@ import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { verifyPasswordToken } from '@/lib/jwt';
 import { createSessionToken } from '@/lib/session';
-import { successResponse, errorResponse, ErrorCode } from '@/lib/api-response';
+import { errorResponse, ErrorCode } from '@/lib/api-response';
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
@@ -47,12 +48,19 @@ export async function POST(request: Request) {
     const loginAt = new Date().toISOString();
     const token = await createSessionToken({ uuid: user.uuid, email: user.email, name: user.name });
 
-    return successResponse('로그인에 성공했습니다.', {
-      email: user.email,
-      name: user.name,
-      loginAt,
-      token,
+    const response = NextResponse.json({
+      error: 0,
+      message: '로그인에 성공했습니다.',
+      data: { email: user.email, name: user.name, loginAt, token },
     });
+    response.cookies.set('session_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 30,
+      path: '/',
+    });
+    return response;
   } catch (err) {
     const message = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
     return errorResponse(ErrorCode.INTERNAL_SERVER_ERROR, message);

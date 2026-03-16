@@ -1,12 +1,25 @@
 import RecipeListView from '@/components/recipe/RecipeListView';
 import FloatingAddButton from '@/components/ui/FloatingAddButton';
 import { RaccoonLoco } from '@/components/character/RaccoonLoco';
-import { getAllRecipes } from '@/db/queries/recipe';
+import { getRecipesByUserUuid } from '@/db/queries/recipe';
 import { MAIN_PAGE } from '@/constants/ui';
 import { AuthGuard } from '@/components/auth/AuthGuard';
+import { cookies } from 'next/headers';
+import { verifySessionToken } from '@/lib/session';
 
 export default async function MainPage() {
-  const recipes = await getAllRecipes();
+  const cookieStore = await cookies();
+  const token = cookieStore.get('session_token')?.value;
+
+  let recipes: Awaited<ReturnType<typeof getRecipesByUserUuid>> = [];
+  if (token) {
+    try {
+      const session = await verifySessionToken(token);
+      recipes = await getRecipesByUserUuid(session.uuid);
+    } catch {
+      // 토큰 만료 시 빈 목록
+    }
+  }
 
   return (
     <AuthGuard>
