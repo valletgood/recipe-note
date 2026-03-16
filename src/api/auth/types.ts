@@ -7,6 +7,7 @@ export interface LoginResponse {
   email: string;
   name: string;
   loginAt: string;
+  token: string;
 }
 
 export interface CheckEmailRequest {

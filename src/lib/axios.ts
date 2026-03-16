@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getToken } from "@/lib/auth";
 
 export interface ApiResponse<T> {
   error: number;
@@ -11,6 +12,14 @@ export const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+});
+
+api.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 api.interceptors.response.use(

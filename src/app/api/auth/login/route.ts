@@ -3,6 +3,7 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { verifyPasswordToken } from '@/lib/jwt';
+import { createSessionToken } from '@/lib/session';
 import { successResponse, errorResponse, ErrorCode } from '@/lib/api-response';
 
 export async function POST(request: Request) {
@@ -44,11 +45,13 @@ export async function POST(request: Request) {
     }
 
     const loginAt = new Date().toISOString();
+    const token = await createSessionToken({ uuid: user.uuid, email: user.email, name: user.name });
 
     return successResponse('로그인에 성공했습니다.', {
       email: user.email,
       name: user.name,
       loginAt,
+      token,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.';
