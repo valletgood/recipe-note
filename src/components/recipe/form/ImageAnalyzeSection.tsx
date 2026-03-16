@@ -5,6 +5,7 @@ import Image from 'next/image';
 import GlassCard from '@/components/ui/GlassCard';
 import Button from '@/components/ui/Button';
 import { RaccoonLogo } from '@/components/character/RaccoonLogo';
+import { ADD_RECIPE_PAGE } from '@/constants/ui';
 
 interface ImageAnalyzeSectionProps {
   onAnalyze: (file: File) => void;
@@ -65,6 +66,9 @@ export default function ImageAnalyzeSection({
         </div>
         <p className="mt-1 text-sm text-[var(--point-muted)]">
           레시피 사진이나 스크린샷을 올리면 구리가 자동으로 분석해요
+        </p>
+        <p className="mt-1 text-xs text-[var(--foreground-muted)]">
+          {ADD_RECIPE_PAGE.AI_DISCLAIMER}
         </p>
       </div>
 

@@ -42,6 +42,9 @@ export default function UrlAnalyzeSection({
         <p className="mt-1 text-sm text-[var(--point-muted)]">
           블로그나 사이트 URL을 넣으면 구리가 자동으로 분석해요
         </p>
+        <p className="mt-1 text-xs text-[var(--foreground-muted)]">
+          {ADD_RECIPE_PAGE.AI_DISCLAIMER}
+        </p>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
         <div className="relative min-w-0 flex-1">

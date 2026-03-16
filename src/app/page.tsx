@@ -48,7 +48,7 @@ export default async function MainPage() {
 
             {/* 캐릭터 — 정중앙에 크게 */}
             <div
-              className="flex w-full animate-[staggerFade_0.5s_ease-out_both] justify-center sm:justify-start"
+              className="flex w-full animate-[staggerFade_0.5s_ease-out_both] justify-center"
               style={{ animationDelay: '0.15s' }}
             >
               <RaccoonLogo size="sm" />
