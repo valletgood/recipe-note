@@ -1,5 +1,6 @@
 import RecipeListView from '@/components/recipe/RecipeListView';
 import FloatingAddButton from '@/components/ui/FloatingAddButton';
+import FloatingSettingButton from '@/components/ui/FloatingSettingButton';
 import { RaccoonLoco } from '@/components/character/RaccoonLoco';
 import { getRecipesByUserUuid } from '@/db/queries/recipe';
 import { MAIN_PAGE } from '@/constants/ui';
@@ -68,6 +69,7 @@ export default async function MainPage() {
 
         <RecipeListView recipes={recipes} />
 
+        <FloatingSettingButton />
         <FloatingAddButton href="/recipes/new" label={MAIN_PAGE.ADD_RECIPE} />
       </div>
     </AuthGuard>

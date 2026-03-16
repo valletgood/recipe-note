@@ -101,6 +101,7 @@ body::before {
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
+  overflow: hidden;
   transition:
     grid-template-rows 0.25s ease,
     opacity 0.2s ease;
