@@ -18,6 +18,15 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: "Recipe Note | 레시피 저장",
   description: "AI로 정리하는 나만의 레시피 노트",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Recipe Note",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export default function RootLayout({
