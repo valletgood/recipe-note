@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import RaccoonMascot from "./RaccoonMascot";
+import { RaccoonCrying } from './character/RaccoonCrying';
 
 interface EmptyStateProps {
   title: string;
@@ -11,7 +11,7 @@ interface EmptyStateProps {
 export default function EmptyState({
   title,
   description,
-  className = "",
+  className = '',
 }: EmptyStateProps) {
   return (
     <div
@@ -19,15 +19,13 @@ export default function EmptyState({
       role="status"
       aria-label="내용 없음"
     >
-      <RaccoonMascot className="h-32 w-32 animate-[float_3s_ease-in-out_infinite]" />
+      <RaccoonCrying className="animate-[float_3s_ease-in-out_infinite]" />
       <div className="space-y-2">
         <h2 className="font-display text-xl font-semibold text-[var(--foreground)]">
           {title}
         </h2>
         {description && (
-          <p className="max-w-sm text-[var(--point)]">
-            {description}
-          </p>
+          <p className="max-w-sm text-[var(--point)]">{description}</p>
         )}
       </div>
     </div>

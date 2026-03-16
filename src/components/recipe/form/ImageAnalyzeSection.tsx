@@ -4,6 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
+import { RaccoonLoco } from "@/components/character/RaccoonLoco";
 
 interface ImageAnalyzeSectionProps {
   onAnalyze: (file: File) => void;
@@ -55,9 +56,30 @@ export default function ImageAnalyzeSection({
 
   return (
     <GlassCard variant="strong" className="p-6">
-      <h2 className="font-display mb-4 text-lg font-bold text-[var(--point)]">
-        레시피 이미지
-      </h2>
+      <div className="mb-4">
+        <div className="flex items-center gap-2">
+          <div
+            style={{
+              width: '58px',
+              height: '41px',
+              overflow: 'hidden',
+              flexShrink: 0,
+            }}
+          >
+            <div
+              style={{ transform: 'scale(0.25)', transformOrigin: 'top left' }}
+            >
+              <RaccoonLoco />
+            </div>
+          </div>
+          <h2 className="font-display text-lg font-bold text-[var(--point)]">
+            레시피 이미지
+          </h2>
+        </div>
+        <p className="mt-1 text-sm text-[var(--point-muted)]">
+          레시피 사진이나 스크린샷을 올리면 구리가 자동으로 분석해요
+        </p>
+      </div>
 
       {/* 드롭존 / 미리보기 */}
       {preview ? (
