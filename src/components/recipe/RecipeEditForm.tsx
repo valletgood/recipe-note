@@ -52,7 +52,8 @@ function getInitialNutrition(recipe: Recipe): NutritionData {
   const info = recipe.nutritionInfo;
   return {
     calories: info?.calories != null ? String(info.calories) : '',
-    carbohydrates: info?.carbohydrates != null ? String(info.carbohydrates) : '',
+    carbohydrates:
+      info?.carbohydrates != null ? String(info.carbohydrates) : '',
     protein: info?.protein != null ? String(info.protein) : '',
     fat: info?.fat != null ? String(info.fat) : '',
   };
@@ -127,20 +128,18 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
     router,
   ]);
 
-  const isSaveDisabled =
-    updateMutation.isPending || !basicInfo.title.trim();
+  const isSaveDisabled = updateMutation.isPending || !basicInfo.title.trim();
   const saveButtonCommon = {
     onClick: handleSave,
     isLoading: updateMutation.isPending,
     disabled: isSaveDisabled,
   };
 
-  const errorMessage =
-    updateMutation.isError
-      ? RECIPE_EDIT_PAGE.EDIT_ERROR_MESSAGE
-      : updateMutation.data && updateMutation.data.error !== 0
-        ? updateMutation.data.message
-        : null;
+  const errorMessage = updateMutation.isError
+    ? RECIPE_EDIT_PAGE.EDIT_ERROR_MESSAGE
+    : updateMutation.data && updateMutation.data.error !== 0
+      ? updateMutation.data.message
+      : null;
 
   return (
     <AuthGuard>

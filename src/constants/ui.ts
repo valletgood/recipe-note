@@ -6,7 +6,7 @@ export const MAIN_PAGE = {
 } as const;
 
 export const NAV = {
-  BACK_TO_LIST: '목록으로',
+  BACK_TO_LIST: '홈으로',
 } as const;
 
 export const ADD_RECIPE_PAGE = {
@@ -40,10 +40,8 @@ export const ADD_RECIPE_PAGE = {
   /** 구분선 라벨 */
   SECTION_LABEL_RECIPE_INFO: '레시피 정보',
   /** 에러 메시지 */
-  ERROR_ANALYZE_URL:
-    '레시피 분석 중 오류가 발생했습니다. 다시 시도해주세요.',
-  ERROR_ANALYZE_IMAGE:
-    '이미지 분석 중 오류가 발생했습니다. 다시 시도해주세요.',
+  ERROR_ANALYZE_URL: '레시피 분석 중 오류가 발생했습니다. 다시 시도해주세요.',
+  ERROR_ANALYZE_IMAGE: '이미지 분석 중 오류가 발생했습니다. 다시 시도해주세요.',
   ERROR_SAVE: '레시피 저장 중 오류가 발생했습니다. 다시 시도해주세요.',
   /** 오버레이 최소 표시 시간 (ms) */
   OVERLAY_MIN_DELAY_MS: 2000,
@@ -71,6 +69,7 @@ export const RECIPE_DETAIL_PAGE = {
 
 export const RECIPE_EDIT_PAGE = {
   TITLE: '레시피 수정',
-  SAVE_BUTTON: '수정 완료',
+  EDIT_BUTTON: '레시피 수정',
+  SAVE_BUTTON: '레시피 저장',
   EDIT_ERROR_MESSAGE: '수정 중 오류가 발생했습니다. 다시 시도해주세요.',
 } as const;
