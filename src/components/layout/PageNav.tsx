@@ -21,7 +21,7 @@ export default function PageNav({
 }: PageNavProps) {
   return (
     <nav
-      className="sticky top-0 z-20 bg-[var(--background)]/70 backdrop-blur-xl"
+      className="sticky top-0 z-20 bg-[var(--background)]"
       aria-label="페이지 탐색"
     >
       <div
