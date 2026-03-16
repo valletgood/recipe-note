@@ -29,3 +29,10 @@ export async function updateRecipe(id: string, data: CreateRecipeRequest) {
   );
   return response.data;
 }
+
+export async function deleteRecipe(id: string) {
+  const response = await api.delete<ApiResponse<CreateRecipeResponse>>(
+    `/api/recipes/${id}`
+  );
+  return response.data;
+}

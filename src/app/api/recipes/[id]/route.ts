@@ -7,6 +7,27 @@ interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
+export async function DELETE(_request: Request, { params }: RouteParams) {
+  try {
+    const { id } = await params;
+
+    const [deleted] = await db
+      .delete(recipes)
+      .where(eq(recipes.id, id))
+      .returning({ id: recipes.id });
+
+    if (!deleted) {
+      return errorResponse(ErrorCode.NOT_FOUND, "레시피를 찾을 수 없습니다.");
+    }
+
+    return successResponse("레시피가 삭제되었습니다.", { id: deleted.id });
+  } catch (err) {
+    const message =
+      err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.";
+    return errorResponse(ErrorCode.INTERNAL_SERVER_ERROR, message);
+  }
+}
+
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
     const { id } = await params;

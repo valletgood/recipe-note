@@ -2,17 +2,33 @@
 
 import { useCallback, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { Recipe } from "@/types/recipe";
+import { useDeleteRecipe } from "@/api/recipe/hooks";
 import ChevronIcon from "@/components/ui/ChevronIcon";
+import DetailIcon from "@/components/ui/DetailIcon";
+import PencilIcon from "@/components/ui/PencilIcon";
+import TrashIcon from "@/components/ui/TrashIcon";
 
 interface RecipeListItemProps {
   recipe: Recipe;
 }
 
 export default function RecipeListItem({ recipe }: RecipeListItemProps) {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const deleteMutation = useDeleteRecipe();
 
   const toggle = useCallback(() => setIsOpen((prev) => !prev), []);
+
+  const handleDelete = useCallback(() => {
+    if (!confirm(`"${recipe.title}" 레시피를 삭제할까요?`)) return;
+    deleteMutation.mutate(recipe.id, {
+      onSuccess: (res) => {
+        if (res.error === 0) router.refresh();
+      },
+    });
+  }, [recipe.id, recipe.title, deleteMutation, router]);
 
   const ingredients = recipe.ingredients ?? [];
 
@@ -35,20 +51,30 @@ export default function RecipeListItem({ recipe }: RecipeListItemProps) {
           </span>
         </button>
 
-        {/* 우측 버튼 그룹 */}
-        <div className="flex shrink-0 items-center gap-2">
+        {/* 우측 아이콘 버튼 그룹 */}
+        <div className="flex shrink-0 items-center gap-1">
           <button
             type="button"
-            onClick={toggle}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-[var(--point)] transition-colors hover:bg-[var(--point-bg)]"
+            onClick={handleDelete}
+            disabled={deleteMutation.isPending}
+            className="rounded-lg p-2 text-red-500 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+            aria-label="레시피 삭제"
           >
-            {isOpen ? "접기" : "간단히 보기"}
+            <TrashIcon className="h-5 w-5" />
           </button>
           <Link
-            href={`/recipes/${recipe.id}`}
-            className="rounded-lg bg-[var(--point)] px-3 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-85"
+            href={`/recipes/${recipe.id}/edit`}
+            className="rounded-lg p-2 text-[var(--point-muted)] transition-colors hover:bg-[var(--point-bg)] hover:text-[var(--point)]"
+            aria-label="레시피 수정"
           >
-            자세히 보기
+            <PencilIcon className="h-5 w-5" />
+          </Link>
+          <Link
+            href={`/recipes/${recipe.id}`}
+            className="rounded-lg p-2 text-[var(--point-muted)] transition-colors hover:bg-[var(--point-bg)] hover:text-[var(--point)]"
+            aria-label="자세히 보기"
+          >
+            <DetailIcon className="h-5 w-5" />
           </Link>
         </div>
       </div>
