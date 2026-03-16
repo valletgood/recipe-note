@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 
 interface PageNavProps {
   /** 목록/이전 페이지로 가는 링크 (href 없으면 렌더 안 함) */
@@ -6,8 +7,8 @@ interface PageNavProps {
   backLabel: string;
   /** 중앙 제목 (선택) */
   title?: string;
-  /** 우측 액션 (예: 수정 버튼) */
-  rightAction?: React.ReactNode;
+  /** 우측에 배치할 버튼 등 (ReactNode) */
+  button?: ReactNode;
   /** 컨테이너 최대 너비 (기본 max-w-3xl, 목록과 다를 수 있음) */
   maxWidth?: 'max-w-3xl' | 'max-w-4xl';
 }
@@ -16,7 +17,7 @@ export default function PageNav({
   backHref,
   backLabel,
   title,
-  rightAction,
+  button,
   maxWidth = 'max-w-3xl',
 }: PageNavProps) {
   return (
@@ -53,7 +54,7 @@ export default function PageNav({
         </div>
 
         <div className="flex shrink-0 items-center justify-end">
-          {rightAction ?? <span />}
+          {button ?? <span />}
         </div>
       </div>
     </nav>
