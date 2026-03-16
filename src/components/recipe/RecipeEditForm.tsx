@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import { useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import BasicInfoSection from "@/components/recipe/form/BasicInfoSection";
-import IngredientsSection from "@/components/recipe/form/IngredientsSection";
-import CookingStepsSection from "@/components/recipe/form/CookingStepsSection";
-import NutritionSection from "@/components/recipe/form/NutritionSection";
-import Button from "@/components/ui/Button";
-import { ADD_RECIPE_PAGE, NAV, RECIPE_EDIT_PAGE } from "@/constants/ui";
-import { useUpdateRecipe } from "@/api/recipe/hooks";
-import type { BasicInfoData } from "@/components/recipe/form/BasicInfoSection";
-import type { NutritionData } from "@/components/recipe/form/NutritionSection";
-import type { Ingredient, CookingStep, Recipe } from "@/types/recipe";
-import type { RecipeCategoryValue } from "@/constants/recipe-categories";
+import { useCallback, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import BasicInfoSection from '@/components/recipe/form/BasicInfoSection';
+import IngredientsSection from '@/components/recipe/form/IngredientsSection';
+import CookingStepsSection from '@/components/recipe/form/CookingStepsSection';
+import NutritionSection from '@/components/recipe/form/NutritionSection';
+import Button from '@/components/ui/Button';
+import PageNav from '@/components/layout/PageNav';
+import { ADD_RECIPE_PAGE, NAV, RECIPE_EDIT_PAGE } from '@/constants/ui';
+import { useUpdateRecipe } from '@/api/recipe/hooks';
+import type { BasicInfoData } from '@/components/recipe/form/BasicInfoSection';
+import type { NutritionData } from '@/components/recipe/form/NutritionSection';
+import type { Ingredient, CookingStep, Recipe } from '@/types/recipe';
+import type { RecipeCategoryValue } from '@/constants/recipe-categories';
 
 interface RecipeEditFormProps {
   recipe: Recipe;
@@ -25,38 +25,36 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
 
   const [basicInfo, setBasicInfo] = useState<BasicInfoData>({
     title: recipe.title,
-    description: recipe.description ?? "",
-    category: recipe.category ?? "",
-    difficulty: recipe.difficulty ?? "",
-    cookTimeMinutes: String(recipe.cookTimeMinutes ?? ""),
-    servingCount: String(recipe.servingCount ?? ""),
+    description: recipe.description ?? '',
+    category: recipe.category ?? '',
+    difficulty: recipe.difficulty ?? '',
+    cookTimeMinutes: String(recipe.cookTimeMinutes ?? ''),
+    servingCount: String(recipe.servingCount ?? ''),
   });
 
   const [ingredients, setIngredients] = useState<Ingredient[]>(
     recipe.ingredients?.length
       ? recipe.ingredients
-      : [{ name: "", amount: "", unit: "" }]
+      : [{ name: '', amount: '', unit: '' }],
   );
 
   const [cookingSteps, setCookingSteps] = useState<CookingStep[]>(
     recipe.cookingSteps?.length
       ? recipe.cookingSteps
-      : [{ order: 1, description: "", tip: "" }]
+      : [{ order: 1, description: '', tip: '' }],
   );
 
   const [nutrition, setNutrition] = useState<NutritionData>({
     calories: recipe.nutritionInfo?.calories
       ? String(recipe.nutritionInfo.calories)
-      : "",
+      : '',
     carbohydrates: recipe.nutritionInfo?.carbohydrates
       ? String(recipe.nutritionInfo.carbohydrates)
-      : "",
+      : '',
     protein: recipe.nutritionInfo?.protein
       ? String(recipe.nutritionInfo.protein)
-      : "",
-    fat: recipe.nutritionInfo?.fat
-      ? String(recipe.nutritionInfo.fat)
-      : "",
+      : '',
+    fat: recipe.nutritionInfo?.fat ? String(recipe.nutritionInfo.fat) : '',
   });
 
   const handleSave = useCallback(() => {
@@ -78,7 +76,7 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
           title: basicInfo.title,
           description: basicInfo.description || undefined,
           category: basicInfo.category as RecipeCategoryValue,
-          difficulty: basicInfo.difficulty as "easy" | "medium" | "hard",
+          difficulty: basicInfo.difficulty as 'easy' | 'medium' | 'hard',
           cookTimeMinutes: Number(basicInfo.cookTimeMinutes),
           servingCount: Number(basicInfo.servingCount),
           ingredients,
@@ -93,7 +91,7 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
           if (result.error !== 0) return;
           router.push(`/recipes/${recipe.id}`);
         },
-      }
+      },
     );
   }, [
     basicInfo,
@@ -109,19 +107,10 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-20 border-b border-[var(--glass-border)] bg-[var(--background)]/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-3xl items-center gap-4 px-4 py-4 sm:px-6">
-          <Link
-            href={`/recipes/${recipe.id}`}
-            className="text-[var(--point)] transition-colors hover:text-[var(--point-light)]"
-          >
-            ← {NAV.BACK_TO_LIST}
-          </Link>
-          <h1 className="font-display text-2xl font-bold text-[var(--foreground)]">
-            {RECIPE_EDIT_PAGE.TITLE}
-          </h1>
-        </div>
-      </header>
+      <PageNav
+        backHref={`/recipes/${recipe.id}`}
+        backLabel={NAV.BACK_TO_LIST}
+      />
 
       <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
         <div className="space-y-6">
@@ -131,7 +120,7 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
 
           <div
             className="animate-[staggerFade_0.4s_ease-out_both]"
-            style={{ animationDelay: "0.06s" }}
+            style={{ animationDelay: '0.06s' }}
           >
             <IngredientsSection
               ingredients={ingredients}
@@ -141,7 +130,7 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
 
           <div
             className="animate-[staggerFade_0.4s_ease-out_both]"
-            style={{ animationDelay: "0.12s" }}
+            style={{ animationDelay: '0.12s' }}
           >
             <CookingStepsSection
               steps={cookingSteps}
@@ -151,14 +140,14 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
 
           <div
             className="animate-[staggerFade_0.4s_ease-out_both]"
-            style={{ animationDelay: "0.18s" }}
+            style={{ animationDelay: '0.18s' }}
           >
             <NutritionSection data={nutrition} onChange={setNutrition} />
           </div>
 
           <div
             className="animate-[staggerFade_0.4s_ease-out_both] pb-8"
-            style={{ animationDelay: "0.24s" }}
+            style={{ animationDelay: '0.24s' }}
           >
             {updateMutation.data && updateMutation.data.error !== 0 && (
               <p className="mb-3 text-center text-sm text-red-500">

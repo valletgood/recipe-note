@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRecipeById } from "@/db/queries/recipe";
 import { getCategoryLabel } from "@/constants/recipe-categories";
 import { NAV, RECIPE_DETAIL_PAGE, DIFFICULTY_OPTIONS } from "@/constants/ui";
 import GlassCard from "@/components/ui/GlassCard";
 import PageNav from "@/components/layout/PageNav";
+import FloatingEditButton from "@/components/ui/FloatingEditButton";
 import type { Recipe } from "@/types/recipe";
 
 interface RecipeDetailPageProps {
@@ -31,18 +31,7 @@ export default async function RecipeDetailPage({
 
   return (
     <div className="relative z-10 min-h-screen">
-      <PageNav
-        backHref="/"
-        backLabel={NAV.BACK_TO_LIST}
-        rightAction={
-          <Link
-            href={`/recipes/${id}/edit`}
-            className="rounded-xl bg-[var(--point)] px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
-          >
-            {RECIPE_DETAIL_PAGE.EDIT_BUTTON}
-          </Link>
-        }
-      />
+      <PageNav backHref="/" backLabel={NAV.BACK_TO_LIST} />
 
       <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
         <article className="space-y-8">
@@ -75,15 +64,16 @@ export default async function RecipeDetailPage({
               )}
             </div>
             {recipe.sourceUrl && (
-              <p className="mt-3 text-sm">
-                <span className="text-[var(--point-muted)]">
+              <p className="mt-3 flex min-w-0 gap-1 text-sm">
+                <span className="shrink-0 text-[var(--point-muted)]">
                   {RECIPE_DETAIL_PAGE.SOURCE_URL}:{" "}
                 </span>
                 <a
                   href={recipe.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[var(--point)] underline hover:text-[var(--point-light)]"
+                  className="min-w-0 truncate text-[var(--point)] underline hover:text-[var(--point-light)]"
+                  title={recipe.sourceUrl}
                 >
                   {recipe.sourceUrl}
                 </a>
@@ -188,6 +178,8 @@ export default async function RecipeDetailPage({
           )}
         </article>
       </main>
+
+      <FloatingEditButton href={`/recipes/${id}/edit`} label={RECIPE_DETAIL_PAGE.EDIT_BUTTON} />
     </div>
   );
 }
