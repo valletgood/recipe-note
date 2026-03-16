@@ -15,7 +15,7 @@ export const ADD_RECIPE_PAGE = {
   URL_ANALYZE_BUTTON: 'AI 분석',
   URL_ANALYZING: '분석 중...',
   AI_DISCLAIMER:
-    '구리의 분석 결과는 실수할 수 있으니, 저장 전에 재료와 조리법을 한 번 확인해 주세요.',
+    '구리는 실수할 수 있어요. 저장하기 전에 기본 정보와 재료, 조리법을 꼭 확인해 주세요.',
   INFO_SECTION_TITLE: '기본 정보',
   INGREDIENTS_SECTION_TITLE: '재료',
   STEPS_SECTION_TITLE: '조리 단계',
