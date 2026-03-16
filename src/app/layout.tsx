@@ -1,32 +1,36 @@
-import type { Metadata } from "next";
-import { Outfit, Nunito } from "next/font/google";
-import QueryProvider from "@/lib/query-provider";
-import ThemeApplier from "@/components/ui/ThemeApplier";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Outfit, Nunito } from 'next/font/google';
+import QueryProvider from '@/lib/query-provider';
+import ThemeApplier from '@/components/ui/ThemeApplier';
+import './globals.css';
 
 const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-  display: "swap",
+  variable: '--font-outfit',
+  subsets: ['latin'],
+  display: 'swap',
 });
 
 const nunito = Nunito({
-  variable: "--font-nunito",
-  subsets: ["latin"],
-  display: "swap",
+  variable: '--font-nunito',
+  subsets: ['latin'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: "Recipe Note | 레시피 저장",
-  description: "AI로 정리하는 나만의 레시피 노트",
-  manifest: "/manifest.json",
+  title: 'Recipe Note | 레시피 저장',
+  description: 'AI로 정리하는 나만의 레시피 노트',
+  manifest: '/manifest.json',
+  icons: {
+    icon: '/icons/raccoon/logo.svg',
+    apple: '/icons/raccoon/logo.svg',
+  },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
-    title: "Recipe Note",
+    statusBarStyle: 'default',
+    title: 'Recipe Note',
   },
   other: {
-    "mobile-web-app-capable": "yes",
+    'mobile-web-app-capable': 'yes',
   },
 };
 
