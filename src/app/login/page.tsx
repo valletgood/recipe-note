@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { RaccoonLoco } from '@/components/character/RaccoonLoco';
+import { RaccoonLogo } from '@/components/character/RaccoonLogo';
 import { signPasswordToken } from '@/lib/jwt';
 import { useLogin } from '@/api/auth/hooks';
 import { useAuthStore } from '@/../stores/authStore';
 import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
 import { GuestGuard } from '@/components/auth/GuestGuard';
 
 export default function LoginPage() {
@@ -17,8 +18,9 @@ export default function LoginPage() {
   const loginMutation = useLogin();
   const authLogin = useAuthStore((s) => s.login);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!email.trim() || !password) return;
     const passwordToken = signPasswordToken(password);
     loginMutation.mutate(
       { email: email.toLowerCase().trim(), passwordToken },
@@ -46,13 +48,7 @@ export default function LoginPage() {
         <div className="w-full max-w-sm">
           {/* Hero */}
           <div className="mb-8 flex animate-[staggerFade_0.5s_ease-out_both] flex-col items-center gap-3">
-            <div style={{ width: '116px', height: '81px', overflow: 'hidden' }}>
-              <div
-                style={{ transform: 'scale(0.5)', transformOrigin: 'top left' }}
-              >
-                <RaccoonLoco />
-              </div>
-            </div>
+            <RaccoonLogo size="md" />
             <div className="text-center">
               <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--foreground)]">
                 Recipe Note
@@ -69,41 +65,27 @@ export default function LoginPage() {
             style={{ animationDelay: '0.1s' }}
           >
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="email"
-                  className="text-sm font-medium text-[var(--foreground)]"
-                >
-                  이메일
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="hello@example.com"
-                  required
-                  className="rounded-xl border border-[var(--glass-border)] bg-white/80 px-4 py-3 text-sm text-[var(--foreground)] placeholder:text-[var(--point-muted)] focus:border-[var(--point)] focus:ring-2 focus:ring-[var(--point)]/20 focus:outline-none"
-                />
-              </div>
+              <Input
+                id="email"
+                type="email"
+                label="이메일"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="hello@example.com"
+                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                className="py-3 text-sm"
+              />
 
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="password"
-                  className="text-sm font-medium text-[var(--foreground)]"
-                >
-                  비밀번호
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                  className="rounded-xl border border-[var(--glass-border)] bg-white/80 px-4 py-3 text-sm text-[var(--foreground)] placeholder:text-[var(--point-muted)] focus:border-[var(--point)] focus:ring-2 focus:ring-[var(--point)]/20 focus:outline-none"
-                />
-              </div>
+              <Input
+                id="password"
+                type="password"
+                label="비밀번호"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+                className="py-3 text-sm"
+              />
 
               {loginMutation.data && loginMutation.data.error !== 0 && (
                 <p className="text-center text-sm text-red-500">

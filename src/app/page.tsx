@@ -1,7 +1,7 @@
 import RecipeListView from '@/components/recipe/RecipeListView';
 import FloatingAddButton from '@/components/ui/FloatingAddButton';
 import FloatingSettingButton from '@/components/ui/FloatingSettingButton';
-import { RaccoonLoco } from '@/components/character/RaccoonLoco';
+import { RaccoonLogo } from '@/components/character/RaccoonLogo';
 import { getRecipesByUserUuid } from '@/db/queries/recipe';
 import { MAIN_PAGE } from '@/constants/ui';
 import { AuthGuard } from '@/components/auth/AuthGuard';
@@ -46,23 +46,12 @@ export default async function MainPage() {
               </p>
             </div>
 
-            {/* 캐릭터 */}
+            {/* 캐릭터 — 정중앙에 크게 */}
             <div
-              className="shrink-0 animate-[staggerFade_0.5s_ease-out_both]"
+              className="flex w-full animate-[staggerFade_0.5s_ease-out_both] justify-center sm:justify-start"
               style={{ animationDelay: '0.15s' }}
             >
-              <div
-                style={{ width: '116px', height: '81px', overflow: 'hidden' }}
-              >
-                <div
-                  style={{
-                    transform: 'scale(0.5)',
-                    transformOrigin: 'top left',
-                  }}
-                >
-                  <RaccoonLoco />
-                </div>
-              </div>
+              <RaccoonLogo size="sm" />
             </div>
           </div>
         </section>

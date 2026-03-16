@@ -5,7 +5,7 @@ import GlassCard from '@/components/ui/GlassCard';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { ADD_RECIPE_PAGE } from '@/constants/ui';
-import { RaccoonLoco } from '@/components/character/RaccoonLoco';
+import { RaccoonLogo } from '@/components/character/RaccoonLogo';
 
 interface UrlAnalyzeSectionProps {
   onAnalyze: (url: string) => void;
@@ -34,20 +34,7 @@ export default function UrlAnalyzeSection({
     <GlassCard variant="strong" className="p-6">
       <div className="mb-4">
         <div className="flex items-center gap-2">
-          <div
-            style={{
-              width: '58px',
-              height: '41px',
-              overflow: 'hidden',
-              flexShrink: 0,
-            }}
-          >
-            <div
-              style={{ transform: 'scale(0.25)', transformOrigin: 'top left' }}
-            >
-              <RaccoonLoco />
-            </div>
-          </div>
+          <RaccoonLogo size="xs" />
           <h2 className="font-display text-lg font-bold text-[var(--point)]">
             레시피 주소
           </h2>

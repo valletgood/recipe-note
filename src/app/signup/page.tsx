@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { RaccoonLoco } from '@/components/character/RaccoonLoco';
+import { RaccoonLogo } from '@/components/character/RaccoonLogo';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { signPasswordToken } from '@/lib/jwt';
@@ -88,13 +88,7 @@ export default function SignupPage() {
         <div className="w-full max-w-sm">
           {/* Hero */}
           <div className="mb-8 flex animate-[staggerFade_0.5s_ease-out_both] flex-col items-center gap-3">
-            <div style={{ width: '116px', height: '81px', overflow: 'hidden' }}>
-              <div
-                style={{ transform: 'scale(0.5)', transformOrigin: 'top left' }}
-              >
-                <RaccoonLoco />
-              </div>
-            </div>
+            <RaccoonLogo size="sm" />
             <div className="text-center">
               <h1 className="font-display text-2xl font-bold tracking-tight text-[var(--foreground)]">
                 Recipe Note

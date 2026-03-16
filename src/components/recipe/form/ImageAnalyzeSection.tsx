@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useCallback, useRef, useState } from "react";
-import Image from "next/image";
-import GlassCard from "@/components/ui/GlassCard";
-import Button from "@/components/ui/Button";
-import { RaccoonLoco } from "@/components/character/RaccoonLoco";
+import { useCallback, useRef, useState } from 'react';
+import Image from 'next/image';
+import GlassCard from '@/components/ui/GlassCard';
+import Button from '@/components/ui/Button';
+import { RaccoonLogo } from '@/components/character/RaccoonLogo';
 
 interface ImageAnalyzeSectionProps {
   onAnalyze: (file: File) => void;
@@ -32,16 +32,16 @@ export default function ImageAnalyzeSection({
       const selected = e.target.files?.[0];
       if (selected) handleFile(selected);
     },
-    [handleFile]
+    [handleFile],
   );
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
       const dropped = e.dataTransfer.files[0];
-      if (dropped && dropped.type.startsWith("image/")) handleFile(dropped);
+      if (dropped && dropped.type.startsWith('image/')) handleFile(dropped);
     },
-    [handleFile]
+    [handleFile],
   );
 
   const handleAnalyze = useCallback(() => {
@@ -51,27 +51,14 @@ export default function ImageAnalyzeSection({
   const handleReset = useCallback(() => {
     setFile(null);
     setPreview(null);
-    if (inputRef.current) inputRef.current.value = "";
+    if (inputRef.current) inputRef.current.value = '';
   }, []);
 
   return (
     <GlassCard variant="strong" className="p-6">
       <div className="mb-4">
         <div className="flex items-center gap-2">
-          <div
-            style={{
-              width: '58px',
-              height: '41px',
-              overflow: 'hidden',
-              flexShrink: 0,
-            }}
-          >
-            <div
-              style={{ transform: 'scale(0.25)', transformOrigin: 'top left' }}
-            >
-              <RaccoonLoco />
-            </div>
-          </div>
+          <RaccoonLogo size="xs" />
           <h2 className="font-display text-lg font-bold text-[var(--point)]">
             레시피 이미지
           </h2>
@@ -89,13 +76,13 @@ export default function ImageAnalyzeSection({
             alt="선택된 이미지"
             width={800}
             height={400}
-            className="max-h-60 w-full object-contain bg-[var(--point-bg)]"
+            className="max-h-60 w-full bg-[var(--point-bg)] object-contain"
           />
           {!isAnalyzing && (
             <button
               type="button"
               onClick={handleReset}
-              className="absolute right-2 top-2 rounded-full bg-black/50 p-1 text-white transition-colors hover:bg-black/70"
+              className="absolute top-2 right-2 rounded-full bg-black/50 p-1 text-white transition-colors hover:bg-black/70"
               aria-label="이미지 제거"
             >
               <XIcon className="h-4 w-4" />
@@ -136,7 +123,7 @@ export default function ImageAnalyzeSection({
         isLoading={isAnalyzing}
         onClick={handleAnalyze}
       >
-        {isAnalyzing ? "분석 중..." : "이미지로 레시피 분석"}
+        {isAnalyzing ? '분석 중...' : '이미지로 레시피 분석'}
       </Button>
 
       {isAnalyzing && (
@@ -153,8 +140,17 @@ export default function ImageAnalyzeSection({
 
 function ImageIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
         d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 16M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
       />
     </svg>
@@ -163,8 +159,19 @@ function ImageIcon({ className }: { className?: string }) {
 
 function XIcon({ className }: { className?: string }) {
   return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M6 18L18 6M6 6l12 12"
+      />
     </svg>
   );
 }
