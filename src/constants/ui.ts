@@ -72,4 +72,5 @@ export const RECIPE_DETAIL_PAGE = {
 export const RECIPE_EDIT_PAGE = {
   TITLE: '레시피 수정',
   SAVE_BUTTON: '수정 완료',
+  EDIT_ERROR_MESSAGE: '수정 중 오류가 발생했습니다. 다시 시도해주세요.',
 } as const;
