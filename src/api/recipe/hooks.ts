@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import {
   analyzeRecipe,
+  analyzeRecipeFromImage,
   createRecipe,
   updateRecipe,
   deleteRecipe,
@@ -9,6 +10,12 @@ import {
 export function useAnalyzeRecipe() {
   return useMutation({
     mutationFn: analyzeRecipe,
+  });
+}
+
+export function useAnalyzeRecipeFromImage() {
+  return useMutation({
+    mutationFn: analyzeRecipeFromImage,
   });
 }
 

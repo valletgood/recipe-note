@@ -14,6 +14,17 @@ export async function analyzeRecipe(data: AnalyzeRecipeRequest) {
   return response.data;
 }
 
+export async function analyzeRecipeFromImage(file: File) {
+  const formData = new FormData();
+  formData.append("image", file);
+  const response = await api.post<ApiResponse<AnalyzeRecipeResponse>>(
+    "/api/recipes/analyze-image",
+    formData,
+    { headers: { "Content-Type": undefined } }
+  );
+  return response.data;
+}
+
 export async function createRecipe(data: CreateRecipeRequest) {
   const response = await api.post<ApiResponse<CreateRecipeResponse>>(
     "/api/recipes",
