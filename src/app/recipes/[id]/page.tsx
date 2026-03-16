@@ -4,6 +4,7 @@ import { getRecipeById } from "@/db/queries/recipe";
 import { getCategoryLabel } from "@/constants/recipe-categories";
 import { NAV, RECIPE_DETAIL_PAGE, DIFFICULTY_OPTIONS } from "@/constants/ui";
 import GlassCard from "@/components/ui/GlassCard";
+import PageNav from "@/components/layout/PageNav";
 import type { Recipe } from "@/types/recipe";
 
 interface RecipeDetailPageProps {
@@ -30,22 +31,18 @@ export default async function RecipeDetailPage({
 
   return (
     <div className="relative z-10 min-h-screen">
-      <header className="sticky top-0 z-20 border-b border-[var(--glass-border)] bg-[var(--background)]/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <Link
-            href="/"
-            className="text-[var(--point)] transition-colors hover:text-[var(--point-light)]"
-          >
-            ← {NAV.BACK_TO_LIST}
-          </Link>
+      <PageNav
+        backHref="/"
+        backLabel={NAV.BACK_TO_LIST}
+        rightAction={
           <Link
             href={`/recipes/${id}/edit`}
             className="rounded-xl bg-[var(--point)] px-4 py-2.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
           >
             {RECIPE_DETAIL_PAGE.EDIT_BUTTON}
           </Link>
-        </div>
-      </header>
+        }
+      />
 
       <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
         <article className="space-y-8">
