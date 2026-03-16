@@ -1,50 +1,51 @@
-"use client";
+'use client';
 
-import { useCallback, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import UrlAnalyzeSection from "@/components/recipe/form/UrlAnalyzeSection";
-import BasicInfoSection from "@/components/recipe/form/BasicInfoSection";
-import IngredientsSection from "@/components/recipe/form/IngredientsSection";
-import CookingStepsSection from "@/components/recipe/form/CookingStepsSection";
-import NutritionSection from "@/components/recipe/form/NutritionSection";
-import Button from "@/components/ui/Button";
-import { ADD_RECIPE_PAGE, NAV } from "@/constants/ui";
-import { useAnalyzeRecipe, useCreateRecipe } from "@/api/recipe/hooks";
-import type { BasicInfoData } from "@/components/recipe/form/BasicInfoSection";
-import type { NutritionData } from "@/components/recipe/form/NutritionSection";
-import type { Ingredient, CookingStep } from "@/types/recipe";
-import type { RecipeCategoryValue } from "@/constants/recipe-categories";
+import { useCallback, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import UrlAnalyzeSection from '@/components/recipe/form/UrlAnalyzeSection';
+import BasicInfoSection from '@/components/recipe/form/BasicInfoSection';
+import IngredientsSection from '@/components/recipe/form/IngredientsSection';
+import CookingStepsSection from '@/components/recipe/form/CookingStepsSection';
+import NutritionSection from '@/components/recipe/form/NutritionSection';
+import Button from '@/components/ui/Button';
+import PageNav from '@/components/layout/PageNav';
+import { ADD_RECIPE_PAGE, NAV } from '@/constants/ui';
+import { useAnalyzeRecipe, useCreateRecipe } from '@/api/recipe/hooks';
+import type { BasicInfoData } from '@/components/recipe/form/BasicInfoSection';
+import type { NutritionData } from '@/components/recipe/form/NutritionSection';
+import type { Ingredient, CookingStep } from '@/types/recipe';
+import type { RecipeCategoryValue } from '@/constants/recipe-categories';
 
 export default function NewRecipePage() {
   const router = useRouter();
   const analyzeMutation = useAnalyzeRecipe();
   const createMutation = useCreateRecipe();
 
-  const [sourceUrl, setSourceUrl] = useState<string>("");
+  const [sourceUrl, setSourceUrl] = useState<string>('');
 
   const [basicInfo, setBasicInfo] = useState<BasicInfoData>({
-    title: "",
-    description: "",
-    category: "",
-    difficulty: "",
-    cookTimeMinutes: "",
-    servingCount: "",
+    title: '',
+    description: '',
+    category: '',
+    difficulty: '',
+    cookTimeMinutes: '',
+    servingCount: '',
   });
 
   const [ingredients, setIngredients] = useState<Ingredient[]>([
-    { name: "", amount: "", unit: "" },
+    { name: '', amount: '', unit: '' },
   ]);
 
   const [cookingSteps, setCookingSteps] = useState<CookingStep[]>([
-    { order: 1, description: "", tip: "" },
+    { order: 1, description: '', tip: '' },
   ]);
 
   const [nutrition, setNutrition] = useState<NutritionData>({
-    calories: "",
-    carbohydrates: "",
-    protein: "",
-    fat: "",
+    calories: '',
+    carbohydrates: '',
+    protein: '',
+    fat: '',
   });
 
   const handleAnalyze = useCallback(
@@ -78,10 +79,10 @@ export default function NewRecipePage() {
               fat: String(data.nutrition.fat),
             });
           },
-        }
+        },
       );
     },
-    [analyzeMutation]
+    [analyzeMutation],
   );
 
   const handleSave = useCallback(() => {
@@ -101,41 +102,37 @@ export default function NewRecipePage() {
         title: basicInfo.title,
         description: basicInfo.description || undefined,
         category: basicInfo.category as RecipeCategoryValue,
-        difficulty: basicInfo.difficulty as "easy" | "medium" | "hard",
+        difficulty: basicInfo.difficulty as 'easy' | 'medium' | 'hard',
         cookTimeMinutes: Number(basicInfo.cookTimeMinutes),
         servingCount: Number(basicInfo.servingCount),
         ingredients,
         cookingSteps,
         nutrition: nutritionData,
-        sourceType: sourceUrl ? "url" : "manual",
+        sourceType: sourceUrl ? 'url' : 'manual',
         sourceUrl: sourceUrl || undefined,
       },
       {
         onSuccess: (result) => {
           if (result.error !== 0) return;
-          router.push("/");
+          router.push('/');
         },
-      }
+      },
     );
-  }, [basicInfo, ingredients, cookingSteps, nutrition, sourceUrl, createMutation, router]);
+  }, [
+    basicInfo,
+    ingredients,
+    cookingSteps,
+    nutrition,
+    sourceUrl,
+    createMutation,
+    router,
+  ]);
 
   return (
     <div className="relative z-10 min-h-screen">
-      <header className="sticky top-0 z-20 border-b border-[var(--glass-border)] bg-[var(--background)]/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-3xl items-center gap-4 px-4 py-4 sm:px-6">
-          <Link
-            href="/"
-            className="text-[var(--point)] transition-colors hover:text-[var(--point-light)]"
-          >
-            ← {NAV.BACK_TO_LIST}
-          </Link>
-          <h1 className="font-display text-2xl font-bold text-[var(--foreground)]">
-            {ADD_RECIPE_PAGE.TITLE}
-          </h1>
-        </div>
-      </header>
+      <PageNav backHref="/" backLabel={NAV.BACK_TO_LIST} />
 
-      <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-3xl px-4 sm:px-6">
         <div className="space-y-6">
           {/* URL 분석 섹션 */}
           <div className="animate-[staggerFade_0.4s_ease-out_both]">
@@ -144,7 +141,7 @@ export default function NewRecipePage() {
               isAnalyzing={analyzeMutation.isPending}
               errorMessage={
                 analyzeMutation.isError
-                  ? "레시피 분석 중 오류가 발생했습니다. 다시 시도해주세요."
+                  ? '레시피 분석 중 오류가 발생했습니다. 다시 시도해주세요.'
                   : analyzeMutation.data && analyzeMutation.data.error !== 0
                     ? analyzeMutation.data.message
                     : null
@@ -164,7 +161,7 @@ export default function NewRecipePage() {
           {/* 기본 정보 */}
           <div
             className="animate-[staggerFade_0.4s_ease-out_both]"
-            style={{ animationDelay: "0.06s" }}
+            style={{ animationDelay: '0.06s' }}
           >
             <BasicInfoSection data={basicInfo} onChange={setBasicInfo} />
           </div>
@@ -172,7 +169,7 @@ export default function NewRecipePage() {
           {/* 재료 */}
           <div
             className="animate-[staggerFade_0.4s_ease-out_both]"
-            style={{ animationDelay: "0.12s" }}
+            style={{ animationDelay: '0.12s' }}
           >
             <IngredientsSection
               ingredients={ingredients}
@@ -183,7 +180,7 @@ export default function NewRecipePage() {
           {/* 조리 단계 */}
           <div
             className="animate-[staggerFade_0.4s_ease-out_both]"
-            style={{ animationDelay: "0.18s" }}
+            style={{ animationDelay: '0.18s' }}
           >
             <CookingStepsSection
               steps={cookingSteps}
@@ -194,7 +191,7 @@ export default function NewRecipePage() {
           {/* 영양 정보 */}
           <div
             className="animate-[staggerFade_0.4s_ease-out_both]"
-            style={{ animationDelay: "0.24s" }}
+            style={{ animationDelay: '0.24s' }}
           >
             <NutritionSection data={nutrition} onChange={setNutrition} />
           </div>
@@ -202,7 +199,7 @@ export default function NewRecipePage() {
           {/* 저장 버튼 */}
           <div
             className="animate-[staggerFade_0.4s_ease-out_both] pb-8"
-            style={{ animationDelay: "0.3s" }}
+            style={{ animationDelay: '0.3s' }}
           >
             {createMutation.data && createMutation.data.error !== 0 && (
               <p className="mb-3 text-center text-sm text-red-500">
