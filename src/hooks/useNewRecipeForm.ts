@@ -124,10 +124,10 @@ export function useNewRecipeForm() {
   );
 
   const handleAnalyzeImage = useCallback(
-    (file: File) => {
+    (files: File[]) => {
       setShowOverlay(true);
       overlayStartRef.current = Date.now();
-      analyzeImageMutation.mutate(file, {
+      analyzeImageMutation.mutate(files, {
         onSuccess: handleAnalyzeSuccess,
         onError: hideOverlayAfterMinDelay,
       });

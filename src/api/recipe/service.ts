@@ -14,9 +14,11 @@ export async function analyzeRecipe(data: AnalyzeRecipeRequest) {
   return response.data;
 }
 
-export async function analyzeRecipeFromImage(file: File) {
+export async function analyzeRecipeFromImage(files: File[]) {
   const formData = new FormData();
-  formData.append("image", file);
+  for (const file of files) {
+    formData.append("images", file);
+  }
   const response = await api.post<ApiResponse<AnalyzeRecipeResponse>>(
     "/api/recipes/analyze-image",
     formData,

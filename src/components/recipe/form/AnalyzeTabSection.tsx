@@ -46,7 +46,7 @@ interface AnalyzeTabSectionProps {
   showTutorial: boolean;
   onTutorialToggle: () => void;
   onAnalyzeUrl: (url: string) => void;
-  onAnalyzeImage: (file: File) => void;
+  onAnalyzeImage: (files: File[]) => void;
   isAnalyzingUrl: boolean;
   isAnalyzingImage: boolean;
   urlErrorMessage: string | null;

@@ -53,31 +53,28 @@ const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    const image = formData.get("image");
+    const images = formData.getAll("images");
 
-    if (!image || !(image instanceof File)) {
+    if (!images.length) {
       return errorResponse(ErrorCode.BAD_REQUEST, "이미지 파일이 필요합니다.");
     }
 
-    if (!ALLOWED_MIME_TYPES.includes(image.type)) {
-      return errorResponse(ErrorCode.BAD_REQUEST, "JPG, PNG, WebP, GIF 형식만 지원합니다.");
-    }
+    const imageParts: { type: "image"; image: string; mimeType: string }[] = [];
 
-    if (image.size > MAX_SIZE_BYTES) {
-      return errorResponse(ErrorCode.BAD_REQUEST, "이미지 크기는 10MB 이하여야 합니다.");
+    for (const image of images) {
+      if (!(image instanceof File)) {
+        return errorResponse(ErrorCode.BAD_REQUEST, "올바르지 않은 파일 형식입니다.");
+      }
+      if (!ALLOWED_MIME_TYPES.includes(image.type)) {
+        return errorResponse(ErrorCode.BAD_REQUEST, "JPG, PNG, WebP, GIF 형식만 지원합니다.");
+      }
+      if (image.size > MAX_SIZE_BYTES) {
+        return errorResponse(ErrorCode.BAD_REQUEST, "이미지 크기는 각 10MB 이하여야 합니다.");
+      }
+      const bytes = await image.arrayBuffer();
+      const base64 = Buffer.from(bytes).toString("base64");
+      imageParts.push({ type: "image", image: base64, mimeType: image.type });
     }
-
-    const bytes = await image.arrayBuffer();
-    const base64 = Buffer.from(bytes).toString("base64");
-    const imagePart = {
-      type: "image" as const,
-      image: base64,
-      mimeType: image.type as
-        | "image/jpeg"
-        | "image/png"
-        | "image/webp"
-        | "image/gif",
-    };
 
     const result = await generateText({
       model: google("gemini-2.5-flash"),
@@ -87,11 +84,11 @@ export async function POST(request: Request) {
           role: "user",
           content: [
             // Gemini는 base64 + mimeType 필요. AI SDK 타입에는 mimeType 없어서 별도 변수로 전달
-            imagePart as { type: "image"; image: string },
+            ...(imageParts as { type: "image"; image: string }[]),
             {
               type: "text",
               text: `당신은 요리 레시피 분석 전문가입니다.
-이 이미지에서 요리 레시피 정보를 분석하여 구조화된 데이터로 추출해주세요.
+위의 이미지들은 모두 하나의 레시피를 설명하는 사진들입니다. 이미지들을 종합하여 요리 레시피 정보를 분석하고 구조화된 데이터로 추출해주세요.
 
 ## 분석 지침
 
