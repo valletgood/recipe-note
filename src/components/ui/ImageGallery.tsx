@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import Lightbox from '@/components/ui/Lightbox';
 
 interface ImageGalleryProps {
   images: string[];
@@ -10,6 +11,7 @@ interface ImageGalleryProps {
 
 export default function ImageGallery({ images, alt = '레시피 사진' }: ImageGalleryProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scrollToIndex = useCallback((index: number) => {
@@ -38,6 +40,7 @@ export default function ImageGallery({ images, alt = '레시피 사진' }: Image
   if (!images.length) return null;
 
   return (
+    <>
     <div className="relative w-full overflow-hidden rounded-2xl">
       {/* 스크롤 컨테이너 */}
       <div
@@ -47,7 +50,11 @@ export default function ImageGallery({ images, alt = '레시피 사진' }: Image
       >
         {images.map((url, i) => (
           <div key={url} className="relative w-full shrink-0 snap-center">
-            <div className="relative aspect-[4/3] w-full">
+            <button
+              type="button"
+              className="relative block aspect-[4/3] w-full"
+              onClick={() => setLightboxSrc(url)}
+            >
               <Image
                 src={url}
                 alt={`${alt} ${i + 1}`}
@@ -56,7 +63,7 @@ export default function ImageGallery({ images, alt = '레시피 사진' }: Image
                 sizes="(max-width: 768px) 100vw, 768px"
                 priority={i === 0}
               />
-            </div>
+            </button>
           </div>
         ))}
       </div>
@@ -88,5 +95,10 @@ export default function ImageGallery({ images, alt = '레시피 사진' }: Image
         </>
       )}
     </div>
+
+    {lightboxSrc && (
+      <Lightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
+    )}
+    </>
   );
 }
