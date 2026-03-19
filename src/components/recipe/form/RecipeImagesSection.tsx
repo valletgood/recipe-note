@@ -17,6 +17,41 @@ interface RecipeImagesSectionProps {
 
 const MAX_IMAGES = 10;
 
+const CARD_WRAPPER_CLASS =
+  'relative overflow-hidden rounded-xl border border-[var(--glass-border)] bg-[var(--point-bg)]';
+const REMOVE_BUTTON_CLASS =
+  'absolute top-1 right-1 !rounded-full bg-black/50 !p-0.5 text-white hover:bg-black/70';
+const INDEX_BADGE_CLASS =
+  'absolute bottom-1 left-1 rounded bg-black/40 px-1 text-[10px] text-white';
+
+interface ImageTileProps {
+  /** 1-based index for display */
+  index: number;
+  showRemove: boolean;
+  onRemove?: () => void;
+  children: React.ReactNode;
+}
+
+function ImageTile({ index, showRemove, onRemove, children }: ImageTileProps) {
+  return (
+    <div className={CARD_WRAPPER_CLASS}>
+      {children}
+      {showRemove && onRemove && (
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={onRemove}
+          className={REMOVE_BUTTON_CLASS}
+          aria-label="이미지 제거"
+        >
+          <XIcon className="h-3.5 w-3.5" />
+        </Button>
+      )}
+      <span className={INDEX_BADGE_CLASS}>{index}</span>
+    </div>
+  );
+}
+
 export default function RecipeImagesSection({
   existingUrls = [],
   onExistingUrlsChange,
@@ -82,9 +117,11 @@ export default function RecipeImagesSection({
         <div className="mb-3 grid grid-cols-3 gap-2">
           {/* 기존 저장된 이미지 */}
           {existingUrls.map((url, i) => (
-            <div
+            <ImageTile
               key={url}
-              className="relative overflow-hidden rounded-xl border border-[var(--glass-border)] bg-[var(--point-bg)]"
+              index={i + 1}
+              showRemove={!disabled}
+              onRemove={() => handleRemoveExisting(i)}
             >
               <Image
                 src={url}
@@ -93,28 +130,16 @@ export default function RecipeImagesSection({
                 height={300}
                 className="aspect-square w-full object-cover"
               />
-              {!disabled && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => handleRemoveExisting(i)}
-                  className="absolute top-1 right-1 !rounded-full bg-black/50 !p-0.5 text-white hover:bg-black/70"
-                  aria-label="이미지 제거"
-                >
-                  <XIcon className="h-3.5 w-3.5" />
-                </Button>
-              )}
-              <span className="absolute bottom-1 left-1 rounded bg-black/40 px-1 text-[10px] text-white">
-                {i + 1}
-              </span>
-            </div>
+            </ImageTile>
           ))}
 
           {/* 새로 추가된 파일 (로컬 미리보기) */}
           {newFiles.map((file, i) => (
-            <div
+            <ImageTile
               key={`${file.name}-${file.lastModified}-${i}`}
-              className="relative overflow-hidden rounded-xl border border-[var(--glass-border)] bg-[var(--point-bg)]"
+              index={existingUrls.length + i + 1}
+              showRemove={!disabled}
+              onRemove={() => handleRemoveNew(i)}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -122,21 +147,7 @@ export default function RecipeImagesSection({
                 alt="새 사진"
                 className="aspect-square w-full object-cover"
               />
-              {!disabled && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => handleRemoveNew(i)}
-                  className="absolute top-1 right-1 !rounded-full bg-black/50 !p-0.5 text-white hover:bg-black/70"
-                  aria-label="이미지 제거"
-                >
-                  <XIcon className="h-3.5 w-3.5" />
-                </Button>
-              )}
-              <span className="absolute bottom-1 left-1 rounded bg-black/40 px-1 text-[10px] text-white">
-                {existingUrls.length + i + 1}
-              </span>
-            </div>
+            </ImageTile>
           ))}
         </div>
       )}
