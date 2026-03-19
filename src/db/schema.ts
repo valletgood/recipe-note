@@ -24,6 +24,7 @@ export const recipes = pgTable('recipes', {
   sourceType: varchar('source_type', { length: 20 }),
   sourceUrl: text('source_url'),
   imageUrl: text('image_url'),
+  images: jsonb('images').$type<string[]>(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

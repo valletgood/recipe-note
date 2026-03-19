@@ -39,6 +39,7 @@ export interface CreateRecipeRequest {
   nutrition?: NutritionInfo;
   sourceType?: RecipeSourceType;
   sourceUrl?: string;
+  images?: string[];
 }
 
 export interface CreateRecipeResponse {

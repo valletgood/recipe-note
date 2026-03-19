@@ -1,11 +1,18 @@
 import { useMutation } from "@tanstack/react-query";
 import {
+  uploadRecipeImages,
   analyzeRecipe,
   analyzeRecipeFromImage,
   createRecipe,
   updateRecipe,
   deleteRecipe,
 } from "./service";
+
+export function useUploadRecipeImages() {
+  return useMutation({
+    mutationFn: uploadRecipeImages,
+  });
+}
 
 export function useAnalyzeRecipe() {
   return useMutation({

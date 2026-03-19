@@ -67,6 +67,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
       nutrition,
       sourceType,
       sourceUrl,
+      images,
     } = body;
 
     if (!title || typeof title !== "string") {
@@ -117,6 +118,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
         nutrition: nutrition || null,
         sourceType: sourceType || null,
         sourceUrl: sourceUrl || null,
+        images: Array.isArray(images) ? images : null,
         updatedAt: new Date(),
       })
       .where(and(eq(recipes.id, id), eq(recipes.userUuid, userUuid)))

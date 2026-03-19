@@ -3,13 +3,14 @@
 import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BasicInfoSection from '@/components/recipe/form/BasicInfoSection';
+import RecipeImagesSection from '@/components/recipe/form/RecipeImagesSection';
 import IngredientsSection from '@/components/recipe/form/IngredientsSection';
 import CookingStepsSection from '@/components/recipe/form/CookingStepsSection';
 import NutritionSection from '@/components/recipe/form/NutritionSection';
 import Button from '@/components/ui/Button';
 import PageNav from '@/components/layout/PageNav';
 import { NAV, RECIPE_EDIT_PAGE } from '@/constants/ui';
-import { useUpdateRecipe } from '@/api/recipe/hooks';
+import { useUpdateRecipe, useUploadRecipeImages } from '@/api/recipe/hooks';
 import type { BasicInfoData } from '@/components/recipe/form/BasicInfoSection';
 import type { NutritionData } from '@/components/recipe/form/NutritionSection';
 import type { Ingredient, CookingStep, Recipe } from '@/types/recipe';
@@ -66,6 +67,7 @@ interface RecipeEditFormProps {
 export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
   const router = useRouter();
   const updateMutation = useUpdateRecipe();
+  const uploadImagesMutation = useUploadRecipeImages();
 
   const [basicInfo, setBasicInfo] = useState<BasicInfoData>(() =>
     getInitialBasicInfo(recipe),
@@ -79,9 +81,18 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
   const [nutrition, setNutrition] = useState<NutritionData>(() =>
     getInitialNutrition(recipe),
   );
+  const [recipeImages, setRecipeImages] = useState<string[]>(
+    recipe.images ?? [],
+  );
+  const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     if (!basicInfo.title.trim()) return;
+
+    let uploadedUrls: string[] = [];
+    if (newImageFiles.length) {
+      uploadedUrls = await uploadImagesMutation.mutateAsync(newImageFiles);
+    }
 
     const nutritionData = nutrition.calories
       ? {
@@ -107,6 +118,9 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
           nutrition: nutritionData,
           sourceType: recipe.sourceType,
           sourceUrl: recipe.sourceUrl,
+          images: [...recipeImages, ...uploadedUrls].length
+            ? [...recipeImages, ...uploadedUrls]
+            : undefined,
         },
       },
       {
@@ -121,17 +135,21 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
     ingredients,
     cookingSteps,
     nutrition,
+    recipeImages,
+    newImageFiles,
     recipe.id,
     recipe.sourceType,
     recipe.sourceUrl,
+    uploadImagesMutation,
     updateMutation,
     router,
   ]);
 
-  const isSaveDisabled = updateMutation.isPending || !basicInfo.title.trim();
+  const isSaving = uploadImagesMutation.isPending || updateMutation.isPending;
+  const isSaveDisabled = isSaving || !basicInfo.title.trim();
   const saveButtonCommon = {
     onClick: handleSave,
-    isLoading: updateMutation.isPending,
+    isLoading: isSaving,
     disabled: isSaveDisabled,
   };
 
@@ -160,6 +178,16 @@ export default function RecipeEditForm({ recipe }: RecipeEditFormProps) {
 
       <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
         <div className="space-y-6">
+          <div className={STAGGER_ANIMATION_BASE}>
+            <RecipeImagesSection
+              existingUrls={recipeImages}
+              onExistingUrlsChange={setRecipeImages}
+              newFiles={newImageFiles}
+              onNewFilesChange={setNewImageFiles}
+              disabled={uploadImagesMutation.isPending || updateMutation.isPending}
+            />
+          </div>
+
           <div className={STAGGER_ANIMATION_BASE}>
             <BasicInfoSection data={basicInfo} onChange={setBasicInfo} />
           </div>

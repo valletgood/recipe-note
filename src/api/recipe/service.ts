@@ -7,6 +7,19 @@ import type {
   CreateRecipeResponse,
 } from "./types";
 
+export async function uploadRecipeImages(files: File[]): Promise<string[]> {
+  const formData = new FormData();
+  for (const file of files) {
+    formData.append('images', file);
+  }
+  const response = await api.post<ApiResponse<{ urls: string[] }>>(
+    '/api/recipes/upload-images',
+    formData,
+    { headers: { 'Content-Type': undefined } },
+  );
+  return response.data.data?.urls ?? [];
+}
+
 export async function analyzeRecipe(data: AnalyzeRecipeRequest) {
   const response = await api.post<ApiResponse<AnalyzeRecipeResponse>>(
     "/api/recipes/analyze",

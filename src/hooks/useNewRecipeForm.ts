@@ -6,6 +6,7 @@ import {
   useAnalyzeRecipe,
   useAnalyzeRecipeFromImage,
   useCreateRecipe,
+  useUploadRecipeImages,
 } from '@/api/recipe/hooks';
 import type { AnalyzeRecipeResponse } from '@/api/recipe/types';
 import type { BasicInfoData } from '@/components/recipe/form/BasicInfoSection';
@@ -55,6 +56,7 @@ export function useNewRecipeForm() {
   const analyzeMutation = useAnalyzeRecipe();
   const analyzeImageMutation = useAnalyzeRecipeFromImage();
   const createMutation = useCreateRecipe();
+  const uploadImagesMutation = useUploadRecipeImages();
 
   const [analyzeTab, setAnalyzeTab] = useState<'url' | 'image'>('url');
   const [showTutorial, setShowTutorial] = useState(false);
@@ -66,6 +68,7 @@ export function useNewRecipeForm() {
   const [ingredients, setIngredients] = useState<Ingredient[]>(INITIAL_INGREDIENTS);
   const [cookingSteps, setCookingSteps] = useState<CookingStep[]>(INITIAL_COOKING_STEPS);
   const [nutrition, setNutrition] = useState<NutritionData>(INITIAL_NUTRITION);
+  const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
 
   const hideOverlayAfterMinDelay = useCallback(() => {
     const elapsed = Date.now() - overlayStartRef.current;
@@ -135,7 +138,7 @@ export function useNewRecipeForm() {
     [analyzeImageMutation, handleAnalyzeSuccess, hideOverlayAfterMinDelay],
   );
 
-  const handleSave = useCallback(() => {
+  const handleSave = useCallback(async () => {
     if (!basicInfo.title.trim()) return;
 
     const nutritionData = nutrition.calories
@@ -147,6 +150,13 @@ export function useNewRecipeForm() {
         }
       : undefined;
 
+    // 1. 이미지가 있으면 먼저 업로드
+    let uploadedUrls: string[] = [];
+    if (newImageFiles.length) {
+      uploadedUrls = await uploadImagesMutation.mutateAsync(newImageFiles);
+    }
+
+    // 2. 레시피 저장
     createMutation.mutate(
       {
         title: basicInfo.title,
@@ -160,6 +170,7 @@ export function useNewRecipeForm() {
         nutrition: nutritionData,
         sourceType: sourceUrl ? 'url' : 'manual',
         sourceUrl: sourceUrl || undefined,
+        images: uploadedUrls.length ? uploadedUrls : undefined,
       },
       {
         onSuccess: (result) => {
@@ -174,6 +185,8 @@ export function useNewRecipeForm() {
     cookingSteps,
     nutrition,
     sourceUrl,
+    newImageFiles,
+    uploadImagesMutation,
     createMutation,
     router,
   ]);
@@ -195,6 +208,8 @@ export function useNewRecipeForm() {
     ? ADD_RECIPE_PAGE.ERROR_SAVE
     : null;
 
+  const isSaving = uploadImagesMutation.isPending || createMutation.isPending;
+
   return {
     analyzeTab,
     setAnalyzeTab,
@@ -211,12 +226,15 @@ export function useNewRecipeForm() {
     setCookingSteps,
     nutrition,
     setNutrition,
+    newImageFiles,
+    setNewImageFiles,
     handleAnalyze,
     handleAnalyzeImage,
     handleSave,
     analyzeMutation,
     analyzeImageMutation,
     createMutation,
+    isSaving,
     urlErrorMessage,
     imageErrorMessage,
     saveErrorMessageFromApi,

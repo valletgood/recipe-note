@@ -6,6 +6,7 @@ import GlassCard from '@/components/ui/GlassCard';
 import PageNav from '@/components/layout/PageNav';
 import FloatingEditButton from '@/components/ui/FloatingEditButton';
 import type { Recipe } from '@/types/recipe';
+import ImageGallery from '@/components/ui/ImageGallery';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 
 interface RecipeDetailPageProps {
@@ -37,6 +38,13 @@ export default async function RecipeDetailPage({
 
         <main className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
           <article className="space-y-8">
+            {/* Image Gallery */}
+            {recipe.images && recipe.images.length > 0 && (
+              <div className="animate-[staggerFade_0.4s_ease-out_both]">
+                <ImageGallery images={recipe.images} alt={recipe.title} />
+              </div>
+            )}
+
             {/* Title & meta */}
             <div className="animate-[staggerFade_0.4s_ease-out_both]">
               <h1 className="font-display text-3xl font-bold tracking-tight text-[var(--foreground)] sm:text-4xl">

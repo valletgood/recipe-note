@@ -5,6 +5,7 @@ import IngredientsSection from '@/components/recipe/form/IngredientsSection';
 import CookingStepsSection from '@/components/recipe/form/CookingStepsSection';
 import NutritionSection from '@/components/recipe/form/NutritionSection';
 import AnalyzeTabSection from '@/components/recipe/form/AnalyzeTabSection';
+import RecipeImagesSection from '@/components/recipe/form/RecipeImagesSection';
 import SectionDivider from '@/components/recipe/form/SectionDivider';
 import SaveBlock from '@/components/recipe/form/SaveBlock';
 import Button from '@/components/ui/Button';
@@ -31,12 +32,14 @@ export default function NewRecipePage() {
     setCookingSteps,
     nutrition,
     setNutrition,
+    newImageFiles,
+    setNewImageFiles,
     handleAnalyze,
     handleAnalyzeImage,
     handleSave,
-    createMutation,
     analyzeMutation,
     analyzeImageMutation,
+    isSaving,
     urlErrorMessage,
     imageErrorMessage,
     saveErrorMessageFromApi,
@@ -56,8 +59,8 @@ export default function NewRecipePage() {
               size="sm"
               className="underline"
               onClick={handleSave}
-              isLoading={createMutation.isPending}
-              disabled={createMutation.isPending || !basicInfo.title.trim()}
+              isLoading={isSaving}
+              disabled={isSaving || !basicInfo.title.trim()}
             >
               {ADD_RECIPE_PAGE.SAVE_BUTTON}
             </Button>
@@ -80,6 +83,16 @@ export default function NewRecipePage() {
             />
 
             <SectionDivider label={SECTION_LABEL_RECIPE_INFO} />
+
+            <div className="animate-[staggerFade_0.4s_ease-out_both]">
+              <RecipeImagesSection
+                existingUrls={[]}
+                onExistingUrlsChange={() => {}}
+                newFiles={newImageFiles}
+                onNewFilesChange={setNewImageFiles}
+                disabled={isSaving}
+              />
+            </div>
 
             <div
               className="animate-[staggerFade_0.4s_ease-out_both]"
@@ -119,8 +132,8 @@ export default function NewRecipePage() {
               errorMessageFromApi={saveErrorMessageFromApi}
               errorMessageGeneric={saveErrorMessageGeneric}
               onSave={handleSave}
-              isLoading={createMutation.isPending}
-              disabled={createMutation.isPending || !basicInfo.title.trim()}
+              isLoading={isSaving}
+              disabled={isSaving || !basicInfo.title.trim()}
             />
           </div>
         </main>

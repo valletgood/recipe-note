@@ -39,6 +39,7 @@ export interface Recipe {
   title: string;
   description?: string;
   imageUrl?: string | null;
+  images?: string[] | null;
   /** 음식 카테고리 (국/찌개, 볶음, 구이 등) */
   category?: RecipeCategoryValue;
   /** 필요한 재료 목록 */

@@ -11,6 +11,7 @@ function rowToRecipe(row: (typeof recipes.$inferSelect)): Recipe {
     title: row.title,
     description: row.description ?? undefined,
     imageUrl: row.imageUrl,
+    images: row.images ?? [],
     category: row.category as RecipeCategoryValue,
     ingredients: row.ingredients,
     cookingSteps: row.cookingSteps,
