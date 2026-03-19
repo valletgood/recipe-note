@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import GlassCard from '@/components/ui/GlassCard';
 import Button from '@/components/ui/Button';
@@ -22,6 +22,7 @@ export default function ImageAnalyzeSection({
 }: ImageAnalyzeSectionProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [pasteError, setPasteError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const addFiles = useCallback((selected: FileList | File[]) => {
@@ -65,6 +66,50 @@ export default function ImageAnalyzeSection({
 
   const canAddMore = files.length < MAX_IMAGES;
 
+  // 데스크탑 Ctrl+V / Cmd+V 처리
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      if (isAnalyzing || !canAddMore) return;
+      const items = Array.from(e.clipboardData?.items ?? []);
+      const imageFiles = items
+        .filter(
+          (item) => item.kind === 'file' && item.type.startsWith('image/'),
+        )
+        .map((item) => item.getAsFile())
+        .filter((f): f is File => f !== null);
+      if (imageFiles.length) addFiles(imageFiles);
+    };
+    document.addEventListener('paste', handlePaste);
+    return () => document.removeEventListener('paste', handlePaste);
+  }, [isAnalyzing, canAddMore, addFiles]);
+
+  // 버튼 클릭으로 클립보드에서 이미지 읽기 (iOS 16+ / Android Chrome / Desktop)
+  const handlePasteFromClipboard = useCallback(async () => {
+    setPasteError(null);
+    if (!navigator.clipboard?.read) {
+      setPasteError('이 브라우저는 클립보드 읽기를 지원하지 않아요.');
+      return;
+    }
+    try {
+      const clipboardItems = await navigator.clipboard.read();
+      const imageFiles: File[] = [];
+      for (const item of clipboardItems) {
+        const imageType = item.types.find((t) => t.startsWith('image/'));
+        if (imageType) {
+          const blob = await item.getType(imageType);
+          imageFiles.push(new File([blob], `paste-${Date.now()}.png`, { type: imageType }));
+        }
+      }
+      if (imageFiles.length) {
+        addFiles(imageFiles);
+      } else {
+        setPasteError('클립보드에 이미지가 없어요.');
+      }
+    } catch {
+      setPasteError('클립보드 접근이 거부되었어요. 브라우저 설정에서 허용해주세요.');
+    }
+  }, [addFiles]);
+
   return (
     <GlassCard variant="strong" className="p-6">
       <div className="mb-4">
@@ -78,7 +123,8 @@ export default function ImageAnalyzeSection({
           레시피 사진이나 스크린샷을 올리면 구리가 자동으로 분석해요
         </p>
         <p className="mt-0.5 text-xs text-[var(--foreground-muted)]">
-          여러 장을 함께 올리면 하나의 레시피로 통합 분석해요 (최대 {MAX_IMAGES}장)
+          여러 장을 함께 올리면 하나의 레시피로 통합 분석해요 (최대 {MAX_IMAGES}
+          장)
         </p>
         <p className="mt-1 text-xs text-[var(--foreground-muted)]">
           {ADD_RECIPE_PAGE.AI_DISCLAIMER}
@@ -101,14 +147,15 @@ export default function ImageAnalyzeSection({
                 className="aspect-square w-full object-cover"
               />
               {!isAnalyzing && (
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
                   onClick={() => handleRemove(i)}
-                  className="absolute top-1 right-1 rounded-full bg-black/50 p-0.5 text-white transition-colors hover:bg-black/70"
+                  className="absolute top-1 right-1 !rounded-full bg-black/50 !p-0.5 text-white hover:bg-black/70"
                   aria-label="이미지 제거"
                 >
                   <XIcon className="h-3.5 w-3.5" />
-                </button>
+                </Button>
               )}
               <span className="absolute bottom-1 left-1 rounded bg-black/40 px-1 text-[10px] text-white">
                 {i + 1}
@@ -118,33 +165,54 @@ export default function ImageAnalyzeSection({
 
           {/* 추가 버튼 (MAX_IMAGES 미만일 때) */}
           {canAddMore && !isAnalyzing && (
-            <button
+            <Button
               type="button"
+              variant="ghost"
               onClick={() => inputRef.current?.click()}
-              className="flex aspect-square flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-[var(--glass-border)] bg-[var(--point-bg)] text-[var(--point-muted)] transition-colors hover:border-[var(--point)]"
+              className="flex aspect-square !h-auto flex-col items-center justify-center gap-1 !rounded-xl border-2 border-dashed border-[var(--glass-border)] bg-[var(--point-bg)] text-[var(--point-muted)] hover:border-[var(--point)]"
             >
               <PlusIcon className="h-6 w-6" />
               <span className="text-[10px]">추가</span>
-            </button>
+            </Button>
           )}
         </div>
       )}
 
       {/* 드롭존 (이미지가 없을 때만 표시) */}
       {previews.length === 0 && (
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
+        <div
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
-          className="flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-[var(--glass-border)] bg-[var(--point-bg)] px-4 py-10 text-[var(--point-muted)] transition-colors hover:border-[var(--point)] hover:bg-[var(--point-bg)]"
+          className="flex w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-[var(--glass-border)] bg-[var(--point-bg)] px-4 py-8 text-[var(--point-muted)]"
         >
           <ImageIcon className="h-8 w-8" />
-          <span className="text-sm font-medium">
-            탭하거나 이미지를 드래그해서 올려주세요
+          <span className="text-sm text-[var(--foreground-muted)]">
+            이미지를 드래그하거나 아래 버튼으로 추가하세요
           </span>
-          <span className="text-xs">JPG, PNG, WebP · 최대 10MB · 최대 {MAX_IMAGES}장</span>
-        </button>
+          <span className="text-xs text-[var(--foreground-muted)]">
+            JPG, PNG, WebP · 최대 10MB · 최대 {MAX_IMAGES}장
+          </span>
+          <div className="flex flex-col gap-2">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => inputRef.current?.click()}
+            >
+              <GalleryIcon className="mr-1.5 h-4 w-4" />
+              갤러리에서 선택
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={handlePasteFromClipboard}
+            >
+              <ClipboardIcon className="mr-1.5 h-4 w-4" />
+              클립보드 붙여넣기
+            </Button>
+          </div>
+        </div>
       )}
 
       <input
@@ -156,6 +224,10 @@ export default function ImageAnalyzeSection({
         onChange={handleChange}
         disabled={isAnalyzing}
       />
+
+      {pasteError && (
+        <p className="mt-2 text-xs text-red-500">{pasteError}</p>
+      )}
 
       {/* 분석 버튼 */}
       <Button
@@ -237,6 +309,44 @@ function PlusIcon({ className }: { className?: string }) {
         strokeLinejoin="round"
         strokeWidth={2}
         d="M12 4v16m8-8H4"
+      />
+    </svg>
+  );
+}
+
+function GalleryIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 16M14 8h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+      />
+    </svg>
+  );
+}
+
+function ClipboardIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1.5}
+        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
       />
     </svg>
   );
