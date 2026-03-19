@@ -133,10 +133,14 @@ export default function ImageAnalyzeSection({
       } else {
         setPasteError('클립보드에 이미지가 없어요.');
       }
-    } catch {
-      setPasteError(
-        '클립보드 접근이 거부되었어요. 브라우저 설정에서 허용해주세요.',
-      );
+    } catch (err) {
+      if (err instanceof DOMException && err.name === 'NotAllowedError') {
+        setPasteError(
+          '클립보드 접근이 거부되었어요. 브라우저 설정에서 허용해주세요.',
+        );
+      } else {
+        setPasteError('클립보드에 이미지가 없어요.');
+      }
     }
   }, [addFiles]);
 
@@ -252,6 +256,9 @@ export default function ImageAnalyzeSection({
               {pasteError && (
                 <p className="mt-2 text-xs text-red-500">{pasteError}</p>
               )}
+              <p className="mt-2 text-xs text-[var(--foreground-muted)]">
+                자동으로 가져오지 못한 경우 위 영역을 탭한 뒤 직접 붙여넣어주세요.
+              </p>
             </div>
           )}
         </div>
