@@ -1,8 +1,12 @@
 import { generateText, Output } from "ai";
-import { google } from "@ai-sdk/google";
+import { llm } from "@/lib/llm";
 import { z } from "zod";
 import { successResponse, errorResponse, ErrorCode } from "@/lib/api-response";
 import { RECIPE_CATEGORIES } from "@/constants/recipe-categories";
+
+// LLM 분석은 수 분까지 걸릴 수 있어 함수 실행 시간을 최대로 늘린다
+export const runtime = "nodejs";
+export const maxDuration = 300;
 
 const categoryValues = RECIPE_CATEGORIES.map((c) => c.value);
 
@@ -77,13 +81,13 @@ export async function POST(request: Request) {
     }
 
     const result = await generateText({
-      model: google("gemini-2.5-flash"),
+      model: llm,
       output: Output.object({ schema: recipeSchema }),
       messages: [
         {
           role: "user",
           content: [
-            // Gemini는 base64 + mimeType 필요. AI SDK 타입에는 mimeType 없어서 별도 변수로 전달
+            // base64 + mimeType 전달. AI SDK 타입에 mimeType이 없어 별도 변수로 우회
             ...(imageParts as { type: "image"; image: string }[]),
             {
               type: "text",

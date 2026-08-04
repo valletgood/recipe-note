@@ -20,10 +20,14 @@ export async function uploadRecipeImages(files: File[]): Promise<string[]> {
   return response.data.data?.urls ?? [];
 }
 
+/** LLM 분석은 수 분까지 걸릴 수 있어 공통 30초 타임아웃을 해제한다 */
+const NO_TIMEOUT = 0;
+
 export async function analyzeRecipe(data: AnalyzeRecipeRequest) {
   const response = await api.post<ApiResponse<AnalyzeRecipeResponse>>(
     "/api/recipes/analyze",
-    data
+    data,
+    { timeout: NO_TIMEOUT }
   );
   return response.data;
 }
@@ -42,7 +46,7 @@ export async function analyzeRecipeFromImage(files: File[]) {
   const response = await api.post<ApiResponse<AnalyzeRecipeResponse>>(
     "/api/recipes/analyze-image",
     formData,
-    { headers: { "Content-Type": undefined } }
+    { headers: { "Content-Type": undefined }, timeout: NO_TIMEOUT }
   );
   return response.data;
 }

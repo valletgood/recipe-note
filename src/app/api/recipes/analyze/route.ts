@@ -1,8 +1,12 @@
 import { generateText, Output } from "ai";
-import { google } from "@ai-sdk/google";
+import { llm } from "@/lib/llm";
 import { z } from "zod";
 import { successResponse, errorResponse, ErrorCode } from "@/lib/api-response";
 import { RECIPE_CATEGORIES } from "@/constants/recipe-categories";
+
+// LLM 분석은 수 분까지 걸릴 수 있어 함수 실행 시간을 최대로 늘린다
+export const runtime = "nodejs";
+export const maxDuration = 300;
 
 const categoryValues = RECIPE_CATEGORIES.map((c) => c.value);
 
@@ -221,7 +225,7 @@ export async function POST(request: Request) {
     }
 
     const result = await generateText({
-      model: google("gemini-2.5-flash"),
+      model: llm,
       output: Output.object({ schema: recipeSchema }),
       prompt: `당신은 요리 레시피 분석 전문가입니다.
 

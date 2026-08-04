@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel Art Mouse</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+  canvas {
+    image-rendering: pixelated;
+    border-radius: 12px;
+    box-shadow: 0 0 60px rgba(100, 100, 255, 0.1);
+  }
+  .sparkle {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    background: #fff;
+    border-radius: 50%;
+    animation: twinkle 2s infinite;
+    pointer-events: none;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; transform: scale(0); }
+    50% { opacity: 0.8; transform: scale(1); }
+  }
+</style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+<script>
+const PIXEL = 20;
+const COLS = 32;
+const ROWS = 32;
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = COLS * PIXEL;
+canvas.height = ROWS * PIXEL;
+
+// Color palette
+const C = {
+  _: '#1e1e2f',   // background
+  W: '#f0eff4',   // white body
+  L: '#dddce3',   // light gray shadow
+  G: '#b8b7c0',   // gray outline
+  D: '#8a899a',   // dark gray
+  P: '#f5a0b0',   // pink ear/nose
+  R: '#e87d93',   // darker pink
+  K: '#2a1520',   // black eye
+  E: '#3d2535',   // eye dark
+  H: '#f7c5c5',   // blush
+  S: '#ffffff',   // eye highlight
+  T: '#c8c7d0',   // tail
+};
+
+// 32x32 pixel grid
+const grid = [
+// 0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+  ['_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_'], // 0
+  ['_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_'], // 1
+  ['_','_','_','_','_','_','_','G','G','G','_','_','_','_','_','_','_','_','_','_','_','_','G','G','G','_','_','_','_','_','_','_'], // 2
+  ['_','_','_','_','_','_','G','D','D','D','G','_','_','_','_','_','_','_','_','_','_','G','D','D','D','G','_','_','_','_','_','_'], // 3
+  ['_','_','_','_','_','G','D','L','L','L','D','G','_','_','_','_','_','_','_','_','G','D','L','L','L','D','G','_','_','_','_','_'], // 4
+  ['_','_','_','_','_','G','D','P','P','P','L','D','G','_','_','_','_','_','_','G','D','L','P','P','P','D','G','_','_','_','_','_'], // 5
+  ['_','_','_','_','G','D','P','P','R','P','P','L','D','G','G','G','G','G','G','D','L','P','P','R','P','P','D','G','_','_','_','_'], // 6
+  ['_','_','_','_','G','D','P','R','R','R','P','L','W','W','W','W','W','W','W','W','L','P','R','R','R','P','D','G','_','_','_','_'], // 7
+  ['_','_','_','_','G','D','L','P','P','P','L','W','W','W','W','W','W','W','W','W','W','L','P','P','P','L','D','G','_','_','_','_'], // 8
+  ['_','_','_','_','_','G','D','L','L','L','W','W','W','W','W','W','W','W','W','W','W','W','L','L','L','D','G','_','_','_','_','_'], // 9
+  ['_','_','_','_','_','_','G','G','G','W','W','W','W','W','W','W','W','W','W','W','W','W','W','G','G','G','_','_','_','_','_','_'], // 10
+  ['_','_','_','_','_','_','_','G','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','G','_','_','_','_','_','_','_'], // 11
+  ['_','_','_','_','_','_','G','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','G','_','_','_','_','_','_'], // 12
+  ['_','_','_','_','_','G','W','W','W','W','K','K','K','W','W','W','W','W','K','K','K','W','W','W','W','W','G','_','_','_','_','_'], // 13
+  ['_','_','_','_','_','G','W','W','W','K','K','E','K','K','W','W','W','K','K','E','K','K','W','W','W','W','G','_','_','_','_','_'], // 14
+  ['_','_','_','_','G','W','W','W','W','K','E','K','S','K','W','W','W','K','S','K','E','K','W','W','W','W','W','G','_','_','_','_'], // 15
+  ['_','_','_','_','G','W','W','W','W','K','K','K','K','K','W','W','W','K','K','K','K','K','W','W','W','W','W','G','_','_','_','_'], // 16
+  ['_','_','_','_','G','W','W','W','W','W','K','K','K','W','W','W','W','W','K','K','K','W','W','W','W','W','W','G','_','_','_','_'], // 17
+  ['_','_','_','_','G','W','W','W','W','W','W','W','W','W','W','P','P','W','W','W','W','W','W','W','W','W','W','G','_','_','_','_'], // 18
+  ['_','_','_','_','G','W','W','W','W','W','W','W','W','W','P','P','P','P','W','W','W','W','W','W','W','W','W','G','_','_','_','_'], // 19
+  ['_','_','_','_','G','W','W','W','W','H','H','W','W','W','W','R','R','W','W','W','H','H','W','W','W','W','W','G','_','_','_','_'], // 20
+  ['_','_','_','_','_','G','W','W','W','H','H','H','W','W','R','W','W','R','W','H','H','H','W','W','W','W','G','_','_','_','_','_'], // 21
+  ['_','_','_','_','_','G','W','W','W','W','H','W','W','W','W','W','W','W','W','W','H','W','W','W','W','W','G','_','_','_','_','_'], // 22
+  ['_','_','_','_','_','_','G','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','G','_','_','_','_','_','_'], // 23
+  ['_','_','_','G','G','G','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','W','G','G','G','_','_','_'], // 24
+  ['_','_','_','G','L','W','W','W','L','L','W','W','W','W','W','W','W','W','W','W','W','W','L','L','W','W','W','L','G','_','_','_'], // 25
+  ['_','_','_','_','G','L','W','L','G','_','G','L','W','W','W','W','W','W','W','W','L','G','_','G','L','W','L','G','_','_','_','_'], // 26
+  ['_','_','_','_','_','G','L','G','_','_','_','G','L','W','W','L','L','W','W','L','G','_','_','_','G','L','G','_','T','_','_','_'], // 27
+  ['_','_','_','_','_','_','G','_','_','_','_','_','G','G','G','G','G','G','G','G','_','_','_','_','_','G','_','T','T','T','_','_'], // 28
+  ['_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','T','L','T','_'], // 29
+  ['_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','T','_','_'], // 30
+  ['_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_','_'], // 31
+];
+
+function draw() {
+  // Background with subtle noise
+  ctx.fillStyle = C._;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw noise particles
+  for (let i = 0; i < 80; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.05})`;
+    ctx.fillRect(Math.floor(x / PIXEL) * PIXEL, Math.floor(y / PIXEL) * PIXEL, PIXEL, PIXEL);
+  }
+
+  // Draw pixels
+  for (let row = 0; row < ROWS; row++) {
+    for (let col = 0; col < COLS; col++) {
+      const key = grid[row][col];
+      if (key === '_') continue;
+      ctx.fillStyle = C[key];
+      ctx.fillRect(col * PIXEL, row * PIXEL, PIXEL, PIXEL);
+    }
+  }
+
+  // Draw sparkle in bottom right
+  const sparkleX = 28 * PIXEL;
+  const sparkleY = 2 * PIXEL;
+  drawSparkle(sparkleX, sparkleY, Date.now());
+}
+
+function drawSparkle(cx, cy, time) {
+  const phase = (Math.sin(time / 800) + 1) / 2;
+  const size = 3 + phase * 3;
+  ctx.save();
+  ctx.globalAlpha = 0.5 + phase * 0.5;
+  ctx.fillStyle = '#d0d0e0';
+
+  // Vertical line
+  ctx.fillRect(cx + PIXEL/2 - 1, cy + PIXEL/2 - size * 2, 2, size * 4);
+  // Horizontal line
+  ctx.fillRect(cx + PIXEL/2 - size * 2, cy + PIXEL/2 - 1, size * 4, 2);
+  // Diagonal
+  ctx.fillRect(cx + PIXEL/2 - size, cy + PIXEL/2 - size, size * 2, 2);
+  ctx.fillRect(cx + PIXEL/2 - 1, cy + PIXEL/2 - size, 2, size * 2);
+
+  ctx.restore();
+}
+
+function animate() {
+  draw();
+  requestAnimationFrame(animate);
+}
+
+// Add background sparkle elements
+for (let i = 0; i < 15; i++) {
+  const sparkle = document.createElement('div');
+  sparkle.className = 'sparkle';
+  sparkle.style.left = Math.random() * 100 + '%';
+  sparkle.style.top = Math.random() * 100 + '%';
+  sparkle.style.animationDelay = Math.random() * 2 + 's';
+  sparkle.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+  document.body.appendChild(sparkle);
+}
+
+animate();
+</script>
+</body>
+</html>
